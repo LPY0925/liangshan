@@ -245,7 +245,11 @@ function regionLevel(value) {
 
 async function initRegionMapBackground() {
     const mapEl = document.getElementById('regionMapBg');
-    if (!mapEl || !window.echarts) return;
+    console.log("[Map] initRegionMapBackground", {mapEl: !!mapEl, echarts: !!window.echarts});
+    if (!mapEl || !window.echarts) {
+        console.warn("[Map] Cannot init - mapEl:", !!mapEl, "echarts:", !!window.echarts);
+        return;
+    }
 
     regionMapChart = echarts.init(mapEl, null, { renderer: 'canvas' });
     regionMapChart.showLoading({
@@ -421,7 +425,7 @@ async function initRegionMapBackground() {
         });
     } catch (error) {
         regionMapChart.hideLoading();
-        console.error('地图加载失败', error);
+        console.error("[Map] ",'地图加载失败', error);
     }
 }
 

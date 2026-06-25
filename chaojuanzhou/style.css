@@ -189,8 +189,8 @@ body::before {
     position: fixed;
     inset: 0;
     z-index: 1;
-    width: auto;
-    height: auto;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
     border: 0;
     border-radius: 0;
@@ -868,7 +868,7 @@ body::before {
     .coordinate-info-card {
         right: 1rem;
         left: 4.3rem;
-        width: auto;
+        width: 100vw;
         padding: 18px 18px 18px 22px;
         font-size: 13px;
         transform: translate(20px, -50%) scale(0.98);
