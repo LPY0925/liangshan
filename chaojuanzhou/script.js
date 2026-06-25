@@ -260,7 +260,7 @@ async function initRegionMapBackground() {
     });
 
     try {
-        const response = await fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json');
+        const response = await fetch('./data/china.json');
         const geoJson = await response.json();
         echarts.registerMap('china', geoJson);
         regionMapChart.hideLoading();
