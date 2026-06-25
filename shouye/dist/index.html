@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>两山 20 年：从余村的一本账，到中国的 1006 个绿色坐标</title>
+    <link rel="stylesheet" href="../../riyuelunzhuan/style.css?v=embedded-home-20260621b">
+    <link rel="stylesheet" href="./style.css?v=chapter-transition-20260623b">
+    <style>
+/* ── 目录球 ── */
+.catalog-sphere,
+.catalog-sphere *,
+.catalog-sphere *::before,
+.catalog-sphere *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-sphere {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "\601D\6E90\5B8B\4F53", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.cs-toggle {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-toggle:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.catalog-sphere.is-open .cs-toggle {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+  box-shadow: 0 4px 20px rgba(31, 42, 32, 0.22);
+}
+
+.cs-icon {
+  width: 18px;
+  height: 13px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cs-bar {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.catalog-sphere.is-open .cs-bar:nth-child(1) {
+  transform: translateY(5.75px) rotate(45deg);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.5);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(3) {
+  transform: translateY(-5.75px) rotate(-45deg);
+}
+
+.cs-panel {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 278px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(248, 243, 234, 0.96);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(179, 149, 88, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 18px 52px rgba(31, 42, 32, 0.18);
+  padding: 10px 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.97);
+  transition:
+    opacity .32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform .32s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility .32s;
+}
+
+.catalog-sphere.is-open .cs-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.cs-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.cs-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cs-panel::-webkit-scrollbar-thumb {
+  background: rgba(179, 149, 88, 0.2);
+  border-radius: 2px;
+}
+
+.cs-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #3a4e3a;
+  transition: background .2s ease;
+}
+
+.cs-item:hover {
+  background: rgba(138, 159, 99, 0.1);
+}
+
+.cs-item.is-current {
+  background: rgba(138, 159, 99, 0.14);
+  cursor: default;
+}
+
+.cs-item.is-current:hover {
+  background: rgba(138, 159, 99, 0.18);
+}
+
+.cs-thumb {
+  width: 68px;
+  height: 44px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid rgba(179, 149, 88, 0.18);
+  flex-shrink: 0;
+  background: #e8e2d6;
+}
+
+.cs-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .5px;
+}
+
+.cs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .32s;
+}
+
+.catalog-sphere.is-open ~ .cs-backdrop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .catalog-sphere {
+    top: 12px;
+    left: 12px;
+  }
+  .cs-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .cs-panel {
+    top: 48px;
+    width: calc(100vw - 32px);
+    max-width: 278px;
+  }
+}
+    </style>
+  </head>
+
+  <body>
+    <!-- 目录球 -->
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="开篇,壹">
+      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
+        <span class="cs-icon" aria-hidden="true">
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+        </span>
+      </button>
+      <div class="cs-panel" aria-hidden="true">
+        <a class="cs-item" href="#" data-chapter="开篇">
+          <img class="cs-thumb" src="../../images/nav/开篇.png" alt="">
+          <span class="cs-label">开篇</span>
+        </a>
+        <a class="cs-item" href="#chapter-1" data-chapter="壹">
+          <img class="cs-thumb" src="../../images/nav/壹.png" alt="">
+          <span class="cs-label">壹 · 第一个坐标</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
+          <img class="cs-thumb" src="../../images/nav/贰.png" alt="">
+          <span class="cs-label">贰 · 青山为凭</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
+          <img class="cs-thumb" src="../../images/nav/叁.png" alt="">
+          <span class="cs-label">叁 · 碧空为证</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
+          <img class="cs-thumb" src="../../images/nav/肆.png" alt="">
+          <span class="cs-label">肆 · 清流为鉴</span>
+        </a>
+        <a class="cs-item" href="wu.html" data-chapter="伍">
+          <img class="cs-thumb" src="../../images/nav/伍.png" alt="">
+          <span class="cs-label">伍 · 一棵树值多少钱？</span>
+        </a>
+        <a class="cs-item" href="../../chaojuanzhou/index.html" data-chapter="陆">
+          <img class="cs-thumb" src="../../images/nav/陆.png" alt="">
+          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
+        </a>
+      </div>
+    </nav>
+    <div class="cs-backdrop" aria-hidden="true"></div>
+
+    <main>
+      <section class="scroll-stage">
+        <section class="comparison-container" id="comparison" aria-label="重渡沟过去与现在的滚动对比">
+          <div class="image-wrapper image-after">
+            <img
+              src="../../images/shouyeqianhouqiehuan-xianzhuangyejingshuicaiyouhuadinggao.png"
+              alt="现在"
+            >
+          </div>
+
+          <div class="image-wrapper image-before">
+            <img
+              src="../../images/shouyeqianhouqiehuan-guoqujianbishouhuidinggao.png"
+              alt="过去"
+            >
+          </div>
+
+          <div class="title-overlay" id="titleOverlay">
+            <img
+              class="title-image"
+              src="../../images/liangshan20nianbiaotitouming.png"
+              alt="两山 20 年：从余村的一本账，到中国的 1006 个绿色坐标"
+            >
+          </div>
+
+          <div class="slider-divider" id="sliderDivider" aria-hidden="true"></div>
+
+          <div class="scroll-hint" id="scrollHint" aria-hidden="true">向下滚动</div>
+        </section>
+      </section>
+
+      <section class="sun-cycle-stage" id="sunCycleStage" aria-label="日月轮转">
+        <canvas id="webgl-canvas"></canvas>
+
+        <div class="sun-intro-mask" id="sunIntroMask" aria-label="余村转折导语">
+          <div class="sun-mask-cursor-glow" id="sunMaskCursorGlow" aria-hidden="true"></div>
+          <div class="sun-mask-cursor-dot" id="sunMaskCursorDot" aria-hidden="true"></div>
+          <div class="sun-intro-text">
+            <h2 class="sun-intro-title" id="chapter-1">壹 · 第一个坐标</h2>
+            <p class="sun-intro-copy">
+              2026年的余村，溪水清澈，竹海如画，游客络绎不绝。而把日历翻回2003年，画面却是另一番模样：矿山机器昼夜轰鸣，石灰粉尘遮天蔽日，村民们捂着口鼻进出。同一个村庄，两种截然不同的命运——而这一切的分野，就藏在二十多年前那个看似普通的决定里。
+            </p>
+          </div>
+        </div>
+
+        <div class="story-layer" aria-label="余村两山转型叙事">
+          <article class="story-card left is-active" data-start="0" data-end="0.17" aria-hidden="false">
+            <div class="story-kicker">粉尘里的金山</div>
+            <p>余村曾经是富的。富在矿山——二十年前，村里一半以上的壮劳力都扎进矿坑和水泥厂，用汗水和轰鸣换来了村集体账本上三百多万元的数字。可这富，是用命换的。粉尘终年不散，村民说那是“住在有毒的牢笼里”。石头磨成了钱，也磨碎了一座山的呼吸。</p>
+          </article>
+          <article class="story-card right" data-start="0.16" data-end="0.29" aria-hidden="true">
+            <div class="story-kicker">壮士断腕</div>
+            <p>2004年，余村人做了一个近乎疯狂的梦：关掉矿山和水泥厂。矿山是命根子，水泥厂是钱袋子，砍了它们，等于自断筋骨。但账本红了，肺黑了，河水白了，山已经喊不出疼。他们咬着牙关停了机器，让山重新沉默。年底一算账：集体收入断崖式跌到二十多万元。</p>
+          </article>
+          <article class="story-card left" data-start="0.28" data-end="0.41" aria-hidden="true">
+            <div class="story-kicker">迷茫的航船</div>
+            <p>二十多万元。一个令人窒息的数字，比贫穷更可怕的是迷茫。矿洞空了，窑炉冷了，村里静得让人心慌。老人坐在石阶上叹气，年轻人收拾行囊准备远走。余村像一艘突然失去动力的船，漂在没有航标的河上。日子要怎么过？没有人知道答案。</p>
+          </article>
+          <article class="story-card right" data-start="0.40" data-end="0.53" aria-hidden="true">
+            <div class="story-kicker">答案</div>
+            <p>2005年8月15日，一个平常的夏日，改变了一切。时任浙江省委书记习近平同志走进余村，听完汇报后说了一句意味深长的话：“过去我们讲既要绿水青山，又要金山银山，其实绿水青山就是金山银山。”石头里出金子，山里同样出金子——只是换了一种挖法。</p>
+          </article>
+          <article class="story-card left" data-start="0.52" data-end="0.65" aria-hidden="true">
+            <div class="story-kicker">重新打量山</div>
+            <p>九天后，《绿水青山也是金山银山》见诸报端。余村人开始重新打量身边的山：它不说话，但藏着另一种财富。竹林茂密，溪水清亮，空气里有松香的味道——这些东西，以前从没人觉得值钱。可当矿山关停之后，它们才从粉尘背后露出了本来面目。原来，山一直在等他们看见。</p>
+          </article>
+          <article class="story-card right" data-start="0.64" data-end="0.77" aria-hidden="true">
+            <div class="story-kicker">泥土生金</div>
+            <p>路，是一步一步走出来的。余村人把矿坑填平种上竹子，把水泥厂旧址改造成荷塘，把老房子修成民宿。游客来了，在竹林里住下来，在溪水边散步，在农家乐里吃一顿粗茶淡饭。一个村民说：“我这辈子，第一次觉得山不是用来开的，是用来看的。”生态账本上的数字，一年比一年好看。</p>
+          </article>
+          <article class="story-card left" data-start="0.76" data-end="0.89" aria-hidden="true">
+            <div class="story-kicker">一本账的蜕变</div>
+            <p>二十年间，余村的这本账变了三次脸：从“亏损账”到“生态账”，再到“富民账”。没有人再提离开的事。年轻人回来了，带着新想法、新生意，也带着新生命。山还是那座山，但人对它的态度变了。它就不再是一堆可以劈开卖掉的石头，而是一个繁荣的生态系统——一座真正的金山。</p>
+          </article>
+          <article class="story-card right has-story-link" data-start="0.88" data-end="1.01" aria-hidden="true">
+            <div class="story-kicker">第一座灯塔</div>
+            <p>余村的转身，是一个国家绿色变革的缩影。如今，一千多个国家级生态文明建设示范区在中国的版图上亮起，像一盏盏绿色的灯。它们分散在不同的经纬度，但讲着同一个道理：人与自然从来不是对手，而是共生的伙伴。余村是第一个坐标，但它绝不孤独。</p>
+            <a id="first-batch-base-link" class="story-link-button" href="../../../fanzhuanlifangti/index.html?v=return-home-anchor-20260622b" aria-label="切换到第一批两山理论实践创新基地翻转立方体网页">
+              <span>第一批"两山"理论实践创新基地</span>
+            </a>
+          </article>
+        </div>
+
+        <div class="scroll-graph-anchor" aria-label="余村集体经济收入变化图表">
+          <button class="chart-expand-button" type="button" aria-label="放大图表到全页面" aria-expanded="false" title="放大图表到全页面">
+            <span class="chart-expand-icon" aria-hidden="true"></span>
+          </button>
+          <button class="chart-flip-button" type="button" aria-label="翻转查看文案合集" aria-pressed="false" title="翻转查看文案合集">
+            <span class="chart-flip-icon" aria-hidden="true"></span>
+          </button>
+          <div class="chart-flip-stage">
+            <div class="chart-face chart-front" aria-label="图表正面">
+              <svg class="scroll-graph" viewBox="0 0 174.222 98" preserveAspectRatio="none">
+                <g class="pov-scale">
+                  <g class="pov-pan">
+                    <rect class="chart-bg" x="0" y="0" width="174.222" height="98" rx="3"/>
+
+                    <text class="chart-title" x="10" y="10">余村集体经济收入变化</text>
+                    <text class="chart-subtitle" x="10" y="15">集体经济收入 / 单位：万元，人均与来源见卡片</text>
+
+                    <g class="chart-grid">
+                      <line x1="18" y1="22" x2="166" y2="22"/>
+                      <line x1="18" y1="40.7" x2="166" y2="40.7"/>
+                      <line x1="18" y1="59.3" x2="166" y2="59.3"/>
+                      <line x1="18" y1="78" x2="166" y2="78"/>
+                    </g>
+
+                    <g class="chart-axis">
+                      <path d="M18 20V78H166"/>
+                      <text class="y-tick" x="15" y="78.9">0</text>
+                      <text class="y-tick" x="15" y="60.2">800</text>
+                      <text class="y-tick" x="15" y="41.6">1600</text>
+                      <text class="y-tick" x="15" y="22.9">2400</text>
+                      <text x="26.4" y="86">2003</text>
+                      <text x="41" y="86">2004</text>
+                      <text x="55.6" y="86">2005</text>
+                      <text x="70.2" y="86">2016</text>
+                      <text x="84.8" y="86">2018</text>
+                      <text x="99.4" y="86">2019</text>
+                      <text x="114" y="86">2020</text>
+                      <text x="128.6" y="86">2021</text>
+                      <text x="143.2" y="86">2022</text>
+                      <text x="157.8" y="86">2023</text>
+                    </g>
+
+                    <g class="bars">
+                      <rect x="23.4" y="71" width="6" height="7"/>
+                      <rect x="38" y="77.5" width="6" height="0.5"/>
+                      <rect x="52.6" y="75.9" width="6" height="2.1"/>
+                      <rect class="bar-mid" x="67.2" y="69.1" width="6" height="8.9"/>
+                      <rect class="bar-mid" x="81.8" y="68.4" width="6" height="9.6"/>
+                      <rect class="bar-mid" x="96.4" y="65.8" width="6" height="12.2"/>
+                      <rect class="bar-rise" x="111" y="61.1" width="6" height="16.9"/>
+                      <rect class="bar-rise" x="125.6" y="59.3" width="6" height="18.7"/>
+                      <rect class="bar-rise" x="140.2" y="47.6" width="6" height="30.4"/>
+                      <rect class="bar-peak" x="154.8" y="25.6" width="6" height="52.4"/>
+                    </g>
+
+                    <path class="complete-line" d="M26.4 71L41 77.5L55.6 75.9L70.2 69.1L84.8 68.4L99.4 65.8L114 61.1L128.6 59.3L143.2 47.6L157.8 25.6"/>
+                    <path class="path" d="M26.4 71L41 77.5L55.6 75.9L70.2 69.1L84.8 68.4L99.4 65.8L114 61.1L128.6 59.3L143.2 47.6L157.8 25.6"/>
+
+                    <g class="dots">
+                      <circle cx="26.4" cy="71" r="1.5"/>
+                      <circle cx="41" cy="77.5" r="1.5"/>
+                      <circle cx="55.6" cy="75.9" r="1.5"/>
+                      <circle cx="70.2" cy="69.1" r="1.5"/>
+                      <circle cx="84.8" cy="68.4" r="1.5"/>
+                      <circle cx="99.4" cy="65.8" r="1.5"/>
+                      <circle cx="114" cy="61.1" r="1.5"/>
+                      <circle cx="128.6" cy="59.3" r="1.5"/>
+                      <circle cx="143.2" cy="47.6" r="1.5"/>
+                      <circle cx="157.8" cy="25.6" r="1.5"/>
+                    </g>
+
+                    <g class="hotspots">
+                      <rect class="hotspot" x="19.6" y="20" width="13.6" height="58" data-year="2003" data-value="村集体经济收入约 300 万元" data-note="关停矿山前，村集体收入主要依靠石灰岩矿山，收入高但生态压力突出。" data-source="浙江人大《人不负青山，青山定不负人——余村十八年》(2023.8)" tabindex="0"/>
+                      <rect class="hotspot" x="34.2" y="20" width="13.6" height="58" data-year="2004" data-value="村集体经济收入 20 万元" data-note="矿山关停后，村集体经济收入骤降，转型阵痛开始显现。" data-source="浙江人大《人不负青山，青山定不负人——余村十八年》(2023.8)" tabindex="0"/>
+                      <rect class="hotspot" x="48.8" y="20" width="13.6" height="58" data-year="2005" data-value="村集体经济收入 91 万元 / 人均 8732 元" data-note="习近平同志首次视察余村，“绿水青山就是金山银山”理念在这里提出。" data-source="中国社会科学网《深化“千万工程”》(2023.7)；中央纪委国家监委网站(2020.4)；新华社(2005.8)" tabindex="0"/>
+                      <rect class="hotspot" x="63.4" y="20" width="13.6" height="58" data-year="2016" data-value="村集体经济收入 380 万元" data-note="绿色产业和乡村经营继续恢复，集体经济进入稳步增长阶段。" data-source="江津网／“两山”理念相关报道" tabindex="0"/>
+                      <rect class="hotspot" x="78" y="20" width="13.6" height="58" data-year="2018" data-value="村集体经济收入 410 万元 / 人均 41378 元" data-note="收入进入稳定恢复阶段，绿色产业和乡村经营的基础继续夯实。" data-source="新京报官微(2019.8)" tabindex="0"/>
+                      <rect class="hotspot" x="92.6" y="20" width="13.6" height="58" data-year="2019" data-value="村集体经济收入 521 万元 / 人均 49598 元" data-note="较上一公开节点继续增长，村集体经营性收入保持温和上行。" data-source="文化和旅游部官网(2020.4)；澎湃新闻(2020.8)" tabindex="0"/>
+                      <rect class="hotspot" x="107.2" y="20" width="13.6" height="58" data-year="2020" data-value="村集体经济收入 724 万元 / 人均 55680 元" data-note="习近平同志再次视察余村，绿色产业和乡村旅游持续发展。" data-source="文化和旅游部官网热点专题(2021.9)；经济观察报(2021.6)；新华社(2020.3)" tabindex="0"/>
+                      <rect class="hotspot" x="121.8" y="20" width="13.6" height="58" data-year="2021" data-value="村集体经济收入 801 万元 / 人均 61000 元" data-note="收入越过800万元水平；余村入选联合国世界旅游组织“最佳旅游乡村”。" data-source="中国文化报·文旅部官网(2023.2)；安吉发布(2022.4)；人民网(2022.5)；浙江省财政厅(2022.1)；联合国世界旅游组织第24届全体大会(2021.12.2)；央广网、人民资讯" tabindex="0"/>
+                      <rect class="hotspot" x="136.4" y="20" width="13.6" height="58" data-year="2022" data-value="村集体经济收入 1305 万元 / 人均 64863 元" data-note="收入迈上千万元台阶，乡村旅游、物业经营等多元收入支撑增强。" data-source="中国社会科学网(2023.7)；浙江日报(2023.3)；川观新闻(2023.10)" tabindex="0"/>
+                      <rect class="hotspot" x="151" y="20" width="13.6" height="58" data-year="2023" data-value="村集体经济收入 2247 万元 / 人均 71000 元" data-note="村集体经济收入突破两千万元，绿色发展带来的经济增量进一步显现。" data-source="中国共产党新闻网(2024.8)；文化和旅游部(2024.3，全国人大代表汪玉成发言)" tabindex="0"/>
+                    </g>
+
+                    <circle class="focal-point" r="1.8"/>
+                  </g>
+                </g>
+              </svg>
+              <div class="chart-tooltip" hidden>
+                <div class="tooltip-year"></div>
+                <div class="tooltip-value"></div>
+                <div class="tooltip-note"></div>
+                <div class="tooltip-source"></div>
+              </div>
+            </div>
+            <section class="chart-face chart-story-back" aria-label="两侧文案合集" aria-hidden="true">
+              <div class="chart-story-back-scroll">
+                <div class="chart-story-collection"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div id="scroll-container" aria-hidden="true">
+          <section></section>
+          <section></section>
+          <section></section>
+          <section></section>
+          <section></section>
+          <section></section>
+          <section></section>
+          <section></section>
+        </div>
+      </section>
+
+      <div id="home-before-time-transition" class="chapter-return-anchor" aria-hidden="true"></div>
+      <div class="chapter-scroll-trigger" id="chapterScrollTrigger" aria-hidden="true"></div>
+    </main>
+
+    <a
+      id="time-transition-link"
+      class="chapter-transition-link"
+      href="../../sancengshijianbianhuan/index.html"
+      tabindex="-1"
+      aria-label="前往三层时间变换页面"
+    >三层时间变换</a>
+
+    <div class="chapter-transition-mask" id="chapterTransitionMask" aria-hidden="true">
+      <div class="chapter-transition-panel chapter-transition-panel--left"></div>
+      <div class="chapter-transition-panel chapter-transition-panel--right"></div>
+    </div>
+
+    <script src="./script.js?v=chapter-anchor-fix-20260625"></script>
+    <script src="../../riyuelunzhuan/script.js?v=embedded-home-20260622-anchor2"></script>
+
+    <script>
+(function () {
+  var sphere = document.querySelector('.catalog-sphere');
+  if (!sphere) return;
+  var toggle = sphere.querySelector('.cs-toggle');
+  var panel = sphere.querySelector('.cs-panel');
+  var backdrop = document.querySelector('.cs-backdrop');
+  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
+  var isOpen = false;
+
+  // 标记当前章节
+  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
+  items.forEach(function (item) {
+    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
+      item.classList.add('is-current');
+      item.setAttribute('aria-current', 'page');
+    }
+  });
+
+  function open() {
+    if (isOpen) return;
+    isOpen = true;
+    sphere.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    sphere.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen ? close() : open();
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', function () { close(); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (isOpen && !sphere.contains(e.target)) {
+      close();
+    }
+  });
+
+  function updateHash(hash) {
+    if (!window.history || !window.history.pushState) return;
+
+    try {
+      var nextUrl = hash || (window.location.pathname + window.location.search);
+      window.history.pushState(null, '', nextUrl);
+    } catch (err) {
+      // 某些本地 file:// 环境可能限制 history，滚动仍然照常执行。
+    }
+  }
+
+  function scrollToOpening() {
+    updateHash('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function scrollToAnchor(href) {
+    if (href === '#') {
+      scrollToOpening();
+      return;
+    }
+
+    var id = href.substring(1);
+
+    if (id === 'chapter-1' && typeof window.scrollToHomeChapterOne === 'function') {
+      updateHash(href);
+      window.scrollToHomeChapterOne({ behavior: 'smooth' });
+      return;
+    }
+
+    var el = document.getElementById(id);
+    if (el) {
+      updateHash(href);
+      var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+  }
+
+  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
+  items.forEach(function (item) {
+    item.addEventListener('click', function (e) {
+      var href = item.getAttribute('href') || '';
+      if (href.indexOf('#') === 0) {
+        // 同页锚点：阻止默认行为，手动滚动
+        e.preventDefault();
+        close();
+        setTimeout(function () {
+          scrollToAnchor(href);
+        }, 350);
+      } else {
+        // 跨页跳转：先关面板，浏览器处理 <a> 导航
+        close();
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) {
+      close();
+      toggle.focus();
+    }
+  });
+})();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEP：生态的账本</title>
+    <link rel="stylesheet" href="../../次页打字机/dist/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ── 目录球 ── */
+.catalog-sphere,
+.catalog-sphere *,
+.catalog-sphere *::before,
+.catalog-sphere *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-sphere {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "\601D\6E90\5B8B\4F53", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.cs-toggle {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-toggle:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.catalog-sphere.is-open .cs-toggle {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+  box-shadow: 0 4px 20px rgba(31, 42, 32, 0.22);
+}
+
+.cs-icon {
+  width: 18px;
+  height: 13px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cs-bar {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.catalog-sphere.is-open .cs-bar:nth-child(1) {
+  transform: translateY(5.75px) rotate(45deg);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.5);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(3) {
+  transform: translateY(-5.75px) rotate(-45deg);
+}
+
+.cs-panel {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 278px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(248, 243, 234, 0.96);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(179, 149, 88, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 18px 52px rgba(31, 42, 32, 0.18);
+  padding: 10px 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.97);
+  transition:
+    opacity .32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform .32s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility .32s;
+}
+
+.catalog-sphere.is-open .cs-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.cs-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.cs-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cs-panel::-webkit-scrollbar-thumb {
+  background: rgba(179, 149, 88, 0.2);
+  border-radius: 2px;
+}
+
+.cs-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #3a4e3a;
+  transition: background .2s ease;
+}
+
+.cs-item:hover {
+  background: rgba(138, 159, 99, 0.1);
+}
+
+.cs-item.is-current {
+  background: rgba(138, 159, 99, 0.14);
+  cursor: default;
+}
+
+.cs-item.is-current:hover {
+  background: rgba(138, 159, 99, 0.18);
+}
+
+.cs-thumb {
+  width: 68px;
+  height: 44px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid rgba(179, 149, 88, 0.18);
+  flex-shrink: 0;
+  background: #e8e2d6;
+}
+
+.cs-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .5px;
+}
+
+.cs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .32s;
+}
+
+.catalog-sphere.is-open ~ .cs-backdrop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .catalog-sphere {
+    top: 12px;
+    left: 12px;
+  }
+  .cs-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .cs-panel {
+    top: 48px;
+    width: calc(100vw - 32px);
+    max-width: 278px;
+  }
+}
+    </style>
+    <style>
+      .intro-copy {
+        font-family: "Noto Serif SC", "Source Han Serif SC", "思源宋体", "SimSun", "宋体", serif;
+      }
+
+      .intro-copy .type-writer-container > p:not(.dek),
+      .copy-panel > p:not(.section-kicker) {
+        text-indent: 2em;
+      }
+
+      main {
+        position: relative;
+      }
+
+      .intro-page.intro-page--solo {
+        --intro-paper-start-gap: 50vh;
+        --intro-paper-start-gap: 50svh;
+        --intro-paper-end-gap: clamp(24px, 5vh, 56px);
+        --intro-paper-end-gap: clamp(24px, 5svh, 56px);
+        --intro-paper-side-gap: clamp(18px, 5vw, 76px);
+        position: relative;
+        top: auto;
+        z-index: 2;
+        display: block;
+        min-height: auto;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .intro-page.intro-page--solo::before,
+      .intro-page.intro-page--solo::after {
+        content: none;
+      }
+
+      .intro-page--solo .bg-scene {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        display: block;
+        width: 100%;
+        height: 100vh;
+        height: 100svh;
+        margin: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .intro-page--solo .bg-scene img {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: none;
+        transform: none;
+      }
+
+      .intro-page--solo .story-stack {
+        position: relative;
+        z-index: 2;
+        width: min(calc(100% - (var(--intro-paper-side-gap) * 2)), calc(880px + (clamp(24px, 4.4vw, 64px) * 2)));
+        margin: var(--intro-paper-start-gap) auto var(--intro-paper-end-gap);
+        display: grid;
+        gap: clamp(26px, 5vh, 56px);
+      }
+
+      .intro-page--solo .intro-copy {
+        position: relative;
+        z-index: 2;
+        isolation: isolate;
+        box-sizing: border-box;
+        width: 100%;
+        margin: 0;
+        min-height: auto;
+        padding: clamp(30px, 4vw, 58px) clamp(24px, 4.4vw, 64px) clamp(36px, 5vw, 70px);
+        overflow: hidden;
+        border: 1px solid rgba(89, 105, 75, 0.26);
+        border-radius: 4px;
+        background:
+          radial-gradient(ellipse at 20% 18%, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.38) 18%, transparent 42%),
+          radial-gradient(ellipse at 82% 24%, rgba(246, 253, 255, 0.58) 0%, rgba(246, 253, 255, 0.30) 20%, transparent 45%),
+          radial-gradient(ellipse at 45% 60%, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.24) 26%, transparent 56%),
+          linear-gradient(180deg, rgba(237, 247, 244, 0.58), rgba(255, 255, 255, 0.36) 45%, rgba(227, 238, 232, 0.48)),
+          rgba(239, 247, 243, 0.44);
+        box-shadow:
+          0 28px 80px rgba(31, 42, 32, 0.26),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.44);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .intro-page--solo .intro-copy::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.58;
+        background:
+          radial-gradient(ellipse at 14% 34%, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.24) 21%, transparent 48%),
+          radial-gradient(ellipse at 64% 18%, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.20) 19%, transparent 44%),
+          radial-gradient(ellipse at 80% 72%, rgba(241, 250, 251, 0.48) 0%, rgba(241, 250, 251, 0.22) 24%, transparent 50%),
+          linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.24) 38%, transparent 69%);
+        background-size: 100% 100%;
+      }
+
+      .intro-page--solo .intro-copy::after {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        z-index: 0;
+        pointer-events: none;
+        border: 1px solid rgba(89, 105, 75, 0.12);
+      }
+
+      .intro-page--solo .intro-copy > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .intro-page--solo .gep-chart-card {
+        position: relative;
+        z-index: 2;
+        isolation: isolate;
+        box-sizing: border-box;
+        width: 100%;
+        padding: clamp(24px, 3.8vw, 42px);
+        overflow: hidden;
+        border: 1px solid rgba(89, 105, 75, 0.26);
+        border-radius: 4px;
+        background:
+          radial-gradient(ellipse at 20% 18%, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.38) 18%, transparent 42%),
+          radial-gradient(ellipse at 82% 24%, rgba(246, 253, 255, 0.58) 0%, rgba(246, 253, 255, 0.30) 20%, transparent 45%),
+          radial-gradient(ellipse at 45% 60%, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.24) 26%, transparent 56%),
+          linear-gradient(180deg, rgba(237, 247, 244, 0.58), rgba(255, 255, 255, 0.36) 45%, rgba(227, 238, 232, 0.48)),
+          rgba(239, 247, 243, 0.44);
+        box-shadow:
+          0 28px 80px rgba(31, 42, 32, 0.26),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.44);
+      }
+
+      .intro-page--solo .gep-chart-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.58;
+        background:
+          radial-gradient(ellipse at 14% 34%, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.24) 21%, transparent 48%),
+          radial-gradient(ellipse at 64% 18%, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.20) 19%, transparent 44%),
+          radial-gradient(ellipse at 80% 72%, rgba(241, 250, 251, 0.48) 0%, rgba(241, 250, 251, 0.22) 24%, transparent 50%),
+          linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.24) 38%, transparent 69%);
+        background-size: 100% 100%;
+      }
+
+      .intro-page--solo .gep-chart-card::after {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        z-index: 0;
+        pointer-events: none;
+        border: 1px solid rgba(89, 105, 75, 0.12);
+      }
+
+      .intro-page--solo .gep-chart-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .gep-chart-figure {
+        margin: 0;
+      }
+
+      .interactive-chart {
+        position: relative;
+        width: 100%;
+      }
+
+      .chart-scroll-wrap {
+        width: 100%;
+      }
+
+      .gep-chart-figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .chart-hotspot {
+        position: absolute;
+        z-index: 3;
+        top: 19.5%;
+        height: 63.5%;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: transparent;
+        color: #783b27;
+        cursor: pointer;
+        transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      }
+
+      .chart-hotspot::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background:
+          linear-gradient(180deg, rgba(182, 91, 59, 0.11), rgba(99, 143, 102, 0.07));
+        opacity: 0;
+        transition: opacity 0.22s ease;
+      }
+
+      .chart-hotspot:focus-visible {
+        outline: 2px solid rgba(102, 70, 35, 0.7);
+        outline-offset: 3px;
+      }
+
+      .chart-hotspot:hover::before,
+      .chart-hotspot:focus-visible::before,
+      .chart-hotspot.is-active::before {
+        opacity: 1;
+      }
+
+      .chart-hotspot:hover,
+      .chart-hotspot:focus-visible,
+      .chart-hotspot.is-active {
+        border-color: rgba(182, 91, 59, 0.34);
+        box-shadow: inset 0 0 0 1px rgba(255, 252, 242, 0.52);
+      }
+
+      .chart-hotspot__label {
+        position: absolute;
+        left: 50%;
+        bottom: 3%;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: rgba(255, 250, 238, 0.88);
+        color: rgba(82, 54, 35, 0.92);
+        font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: nowrap;
+        opacity: 0;
+        box-shadow: 0 6px 16px rgba(31, 42, 32, 0.12);
+        transform: translate(-50%, -3px);
+        transition: opacity 0.22s ease, transform 0.22s ease;
+      }
+
+      .chart-hotspot:hover .chart-hotspot__label,
+      .chart-hotspot:focus-visible .chart-hotspot__label,
+      .chart-hotspot.is-active .chart-hotspot__label {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .chart-hotspot--shenzhen {
+        left: 14.2%;
+        width: 11.6%;
+      }
+
+      .chart-hotspot--bazhong {
+        left: 32.6%;
+        width: 11.6%;
+      }
+
+      .chart-hotspot--lishui {
+        left: 50.8%;
+        width: 11.8%;
+      }
+
+      .chart-hotspot--qiongzhong {
+        left: 69.2%;
+        width: 11.6%;
+      }
+
+      .chart-insight-card {
+        position: relative;
+        z-index: 2;
+        box-sizing: border-box;
+        width: min(740px, 100%);
+        min-height: 148px;
+        margin: 0 auto 18px;
+        padding: 16px 18px 18px;
+        overflow: hidden;
+        border: 1px solid rgba(101, 93, 57, 0.24);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255, 252, 242, 0.94), rgba(239, 247, 236, 0.9)),
+          rgba(255, 250, 238, 0.9);
+        color: rgba(43, 56, 38, 0.92);
+        box-shadow: 0 20px 48px rgba(31, 42, 32, 0.22);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition:
+          opacity 0.18s ease,
+          transform 0.18s ease,
+          visibility 0.18s ease;
+      }
+
+      .chart-insight-card.is-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .chart-insight-card::before {
+        content: "";
+        position: absolute;
+        left: 28px;
+        top: 0;
+        width: 54px;
+        height: 3px;
+        border-radius: 999px;
+        background: rgba(182, 91, 59, 0.68);
+      }
+
+      .chart-insight-card .insight-kicker {
+        display: block;
+        margin-bottom: 8px;
+        color: rgba(111, 75, 45, 0.72);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+      }
+
+      .chart-insight-card h2 {
+        margin: 0 0 8px;
+        color: rgba(36, 61, 45, 0.96);
+        font-size: 19px;
+        line-height: 1.28;
+      }
+
+      .chart-insight-card .insight-stats {
+        margin: 0 0 9px;
+        color: rgba(82, 99, 83, 0.86);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .chart-insight-card .insight-note {
+        margin: 0;
+        color: rgba(44, 61, 47, 0.94);
+        font-size: 15px;
+        line-height: 1.72;
+      }
+
+      .chart-sources {
+        margin: 16px 0 0;
+        font-size: 13px;
+        line-height: 1.72;
+        color: rgba(52, 67, 49, 0.78);
+        text-indent: 0;
+      }
+
+      .chart-sources a {
+        color: rgba(42, 88, 66, 0.96);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+
+      .intro-page--solo.intro-page--solo .intro-copy--long .dek {
+        max-width: none;
+        font-size: clamp(18px, 1.42vw, 21px);
+        line-height: 1.78;
+        white-space: normal;
+      }
+
+      .intro-page--solo.intro-page--solo .intro-copy--long p {
+        font-size: clamp(18px, 1.42vw, 21px);
+        line-height: 1.78;
+      }
+
+      @media (max-width: 620px) {
+        .intro-page.intro-page--solo {
+          --intro-paper-start-gap: 50vh;
+          --intro-paper-start-gap: 50svh;
+          --intro-paper-end-gap: 28px;
+          --intro-paper-side-gap: 16px;
+        }
+
+        .intro-page--solo .intro-copy {
+          min-height: auto;
+          padding: 26px 18px 34px;
+        }
+
+        .intro-page--solo .story-stack {
+          width: calc(100% - 32px);
+          gap: 22px;
+        }
+
+        .intro-page--solo .gep-chart-card {
+          padding: 20px 14px 22px;
+        }
+
+        .chart-scroll-wrap {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 8px;
+        }
+
+        .gep-chart-figure img {
+          width: 640px;
+          max-width: none;
+        }
+
+        .interactive-chart {
+          width: 640px;
+        }
+
+        .chart-insight-card {
+          width: 100%;
+          min-height: 178px;
+        }
+
+        .intro-page--solo .intro-copy::after {
+          inset: 8px;
+        }
+
+        .intro-page--solo .gep-chart-card::after {
+          inset: 8px;
+        }
+
+        .intro-page--solo.intro-page--solo .intro-copy--long p {
+          font-size: 19px;
+        }
+
+        .intro-page--solo.intro-page--solo .intro-copy--long .dek {
+          font-size: 19px;
+          white-space: normal;
+        }
+
+        .chart-sources {
+          font-size: 12px;
+        }
+      }
+
+      /* 纸张底部渐变淡出 */
+      .intro-copy--long .paper-fade-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        height: clamp(160px, 22vh, 280px);
+        pointer-events: none;
+        background: linear-gradient(
+          0deg,
+          rgba(248, 243, 234, 0.96) 0%,
+          rgba(248, 243, 234, 0.72) 24%,
+          rgba(248, 243, 234, 0.34) 52%,
+          transparent 100%
+        );
+      }
+
+      /* ── 分屏转场与顶部跳转 ── */
+      .transition-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        visibility: hidden;
+      }
+      .transition-overlay.is-visible {
+        visibility: visible;
+      }
+      .transition-overlay__pane {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1);
+        will-change: transform;
+      }
+      .transition-overlay__pane--left {
+        left: 0;
+        background: #dcefdc;
+        transform: translateY(100%);
+      }
+      .transition-overlay__pane--right {
+        right: 0;
+        background: #dceefa;
+        transform: translateY(-100%);
+      }
+      .transition-overlay.is-visible .transition-overlay__pane {
+        transform: translateY(0);
+      }
+      .transition-overlay.is-revealing .transition-overlay__pane--left {
+        transform: translateY(-100%);
+      }
+      .transition-overlay.is-revealing .transition-overlay__pane--right {
+        transform: translateY(100%);
+      }
+      .scroll-boundary-link {
+        position: fixed;
+        left: 50%;
+        z-index: 120;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        color: rgba(77, 93, 72, 0.62);
+        font-family: "Noto Serif SC", "Source Han Serif SC", "思源宋体", serif;
+        font-size: 14px;
+        letter-spacing: 4px;
+        text-decoration: none;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -14px);
+        transition: opacity 0.36s ease, transform 0.36s ease;
+      }
+      .scroll-boundary-link.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate(-50%, 0);
+      }
+      .scroll-boundary-link--prev {
+        top: 22px;
+      }
+      .scroll-boundary-link--next {
+        bottom: 22px;
+      }
+      .scroll-boundary-link .edge-arrow {
+        width: 18px;
+        height: 18px;
+        border-right: 2px solid rgba(93, 118, 73, 0.38);
+        border-bottom: 2px solid rgba(93, 118, 73, 0.38);
+        transform: rotate(-135deg);
+      }
+      .scroll-boundary-link--next .edge-arrow {
+        transform: rotate(45deg);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .transition-overlay__pane,
+        .scroll-boundary-link {
+          transition: none;
+        }
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <!-- 目录球 -->
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="伍">
+      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
+        <span class="cs-icon" aria-hidden="true">
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+        </span>
+      </button>
+      <div class="cs-panel" aria-hidden="true">
+        <a class="cs-item" href="index.html" data-chapter="开篇">
+          <img class="cs-thumb" src="../../images/nav/开篇.png" alt="">
+          <span class="cs-label">开篇</span>
+        </a>
+        <a class="cs-item" href="index.html#chapter-1" data-chapter="壹">
+          <img class="cs-thumb" src="../../images/nav/壹.png" alt="">
+          <span class="cs-label">壹 · 第一个坐标</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
+          <img class="cs-thumb" src="../../images/nav/贰.png" alt="">
+          <span class="cs-label">贰 · 青山为凭</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
+          <img class="cs-thumb" src="../../images/nav/叁.png" alt="">
+          <span class="cs-label">叁 · 碧空为证</span>
+        </a>
+        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
+          <img class="cs-thumb" src="../../images/nav/肆.png" alt="">
+          <span class="cs-label">肆 · 清流为鉴</span>
+        </a>
+        <a class="cs-item" href="wu.html" data-chapter="伍">
+          <img class="cs-thumb" src="../../images/nav/伍.png" alt="">
+          <span class="cs-label">伍 · 一棵树值多少钱？</span>
+        </a>
+        <a class="cs-item" href="../../chaojuanzhou/index.html" data-chapter="陆">
+          <img class="cs-thumb" src="../../images/nav/陆.png" alt="">
+          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
+        </a>
+      </div>
+    </nav>
+    <div class="cs-backdrop" aria-hidden="true"></div>
+
+    <main>
+      <section class="intro-page intro-page--solo">
+        <figure class="bg-scene" aria-hidden="true">
+          <img src="../../images/yucunqingshanbeijing.png" alt="">
+        </figure>
+
+        <div class="story-stack">
+          <section class="intro-copy intro-copy--long" aria-label="GEP生态产品价值导语">
+            <div
+              id="demo"
+              class="type-writer-container"
+              role="region"
+              aria-label="GEP生态产品价值导语文字"
+            >
+              <p>
+                <strong>世界上的好东西分两种：一种是免费的，一种是被定价的。最讽刺的是，被定价的那些往往不是最珍贵的。空气、水、土壤、生物多样性——所有让生命成为可能的东西，在很长一段时间里都是免费的。免费的意思是：被人当成了可以无限取用的东西。而当一个东西终于开始有了价格——不管是通过交易、通过经营、通过补偿还是通过金融——人们才开始真正认真对待它。</strong>
+              </p>
+              <p>
+                这也许就是GEP最大的意义。它不是在给自然标价——自然不需要人类的标价。它是在给人类的无知标价。我们曾经不知道一座森林值多少钱，所以毫无顾忌地砍掉了它。现在我们终于学会了算这笔账。不是算得更精了，是算得更明白了。
+              </p>
+              <p>
+                <strong>生态不是没有价格。生态只有两种价格——要么是你保护的代价，要么是你失去的代价。而聪明的文明，选择在失去之前计算。</strong>
+              </p>
+              <p>
+                截至二〇二四年，全国已有十几个省份、上百个县市开展了GEP核算试点。丽水的GEP超过四千亿元，是其GDP的近四倍。这意味着在丽水，自然系统在一年里提供的服务价值，是人的经济活动创造价值的四倍。这不是穷在生态好——丽水不是穷，它的生态本身就值钱。它以前只是穷在没人算过这笔账。
+              </p>
+              <p>
+                如今，账本摊开了。生态产品价值实现的四条路径，正在从政策文本变成田间地头的真实案例——碳市场在交易，生态品牌在溢价，跨省补偿在运转，绿色贷款在流动。生态不再是搁在账本之外的一个美好愿望。它终于上了资产负债表——在它自己的那一栏里，写着：无价。但旁边多了一行小字：可核算。
+              </p>
+            </div>
+
+            <div class="paper-fade-bottom" aria-hidden="true"></div>
+
+          </section>
+
+          <section class="gep-chart-card" aria-label="全国GEP核算试点实例图">
+            <figure class="gep-chart-figure">
+              <aside class="chart-insight-card" id="chartInsight" aria-live="polite">
+                <span class="insight-kicker">热区批语</span>
+                <h2>点击图中柱区</h2>
+                <p class="insight-stats">整块柱区都是可交互范围。</p>
+                <p class="insight-note">把鼠标移到城市所在的整条柱区，或点击它。数据会说数字，批语会说数字背后的心事。</p>
+              </aside>
+              <div class="chart-scroll-wrap">
+                <div class="interactive-chart" id="gepInteractiveChart">
+                  <img src="../../images/quanguogephesuanshidianshuangzhouduibitu.svg" alt="全国GEP核算试点实例双轴对比图，展示深圳、巴中、丽水、琼中的GEP规模和GEP与GDP倍数">
+                  <button
+                    class="chart-hotspot chart-hotspot--shenzhen"
+                    type="button"
+                    data-title="深圳｜高楼里的绿色小数点"
+                    data-gep="GEP 1,363.87亿元"
+                    data-ratio="GEP/GDP 0.04倍"
+                    data-note="在深圳，自然显得很小，却并不轻。一个被产业和高楼占满的城市，仍然需要给空气、水岸和树荫留出坐标；真正的繁华，不是把自然挤出去，而是在寸土寸金里承认它也有席位。"
+                    aria-label="查看深圳GEP批语"
+                    aria-expanded="false"
+                    aria-controls="chartInsight"
+                  >
+                    <span class="chart-hotspot__label">深圳</span>
+                  </button>
+                  <button
+                    class="chart-hotspot chart-hotspot--bazhong"
+                    type="button"
+                    data-title="巴中｜山水开始说话"
+                    data-gep="GEP 2,010.75亿元"
+                    data-ratio="GEP/GDP 2.71倍"
+                    data-note="巴中的曲线像一条被听见的河。过去，山只是背景，水只是经过；现在它们进入账本，像沉默多年的人终于被叫到名字。被核算，不是变俗了，是终于不再被亏欠。"
+                    aria-label="查看巴中GEP批语"
+                    aria-expanded="false"
+                    aria-controls="chartInsight"
+                  >
+                    <span class="chart-hotspot__label">巴中</span>
+                  </button>
+                  <button
+                    class="chart-hotspot chart-hotspot--lishui"
+                    type="button"
+                    data-title="丽水｜迟来的价值正名"
+                    data-gep="GEP 5,024.47亿元"
+                    data-ratio="GEP/GDP 3.60倍"
+                    data-note="丽水这根高柱，像一封迟到的道歉信。它告诉我们：自然从来没有贫穷，贫穷的是旧账本的眼睛。一个地方的山清水秀，不该只是赞美词，也可以是它堂堂正正的资产。"
+                    aria-label="查看丽水GEP批语"
+                    aria-expanded="false"
+                    aria-controls="chartInsight"
+                  >
+                    <span class="chart-hotspot__label">丽水</span>
+                  </button>
+                  <button
+                    class="chart-hotspot chart-hotspot--qiongzhong"
+                    type="button"
+                    data-title="琼中｜安静之地的巨大分量"
+                    data-gep="GEP 1,184.83亿元"
+                    data-ratio="GEP/GDP 15.91倍"
+                    data-note="琼中的倍数冲得很高，不是为了炫耀，而是在提醒我们：有些地方经济声量不大，生命分量却很重。文明最难学会的，是在一个安静的地方还没有被耗尽之前，先向它低头。"
+                    aria-label="查看琼中GEP批语"
+                    aria-expanded="false"
+                    aria-controls="chartInsight"
+                  >
+                    <span class="chart-hotspot__label">琼中</span>
+                  </button>
+                </div>
+              </div>
+            </figure>
+            <p class="chart-sources">
+              数据口径：各地GEP公开核算年份不完全一致；图中“GEP/GDP倍数”按同年度公开GDP或公开报道倍数计算。数据来源：
+              <a href="https://meeb.sz.gov.cn/xxgk/qt/tzgg/content/post_10359115.html" target="_blank" rel="noopener">深圳市生态环境局</a>、
+              <a href="https://tjj.sz.gov.cn/gkmlpt/content/9/9763/post_9763042.html" target="_blank" rel="noopener">深圳市统计局</a>、
+              <a href="https://www.thegpsc.org/sites/default/files/xia_wu_lin_yi_qing_li_shui_gepbao_gao_ning_bo_1030_reduced.pdf" target="_blank" rel="noopener">丽水GEP核算报告</a>、
+              <a href="https://paper.people.com.cn/zgjjzk/html/2019-03/30/content_1917764.htm" target="_blank" rel="noopener">中国经济周刊/人民网</a>、
+              <a href="https://theory.gmw.cn/2023-03/26/content_36455383.htm" target="_blank" rel="noopener">巴中GEP（经济日报/光明网）</a>、
+              <a href="https://tjj.cnbz.gov.cn/tjsj/tjgb/21766251.html" target="_blank" rel="noopener">巴中市统计局</a>、
+              <a href="https://hnxwfbt.hinews.cn/xinwen/show-2334.html" target="_blank" rel="noopener">琼中新闻发布会</a>、
+              <a href="https://qiongzhong.hainan.gov.cn/xxgkzl/tongjiju/xxgkml/202405/t20240526_3669213.html" target="_blank" rel="noopener">琼中县统计局</a>；
+              试点概况参考经济日报/光明网与
+              <a href="https://www.stats.gov.cn/xxgk/jytadf2020/rddbjy2020/202410/t20241031_1957226.html" target="_blank" rel="noopener">国家统计局答复</a>。
+            </p>
+          </section>
+        </div>
+
+      </section>
+
+      <a
+        class="scroll-boundary-link scroll-boundary-link--next"
+        id="scrollNextLink"
+        href="../../chaojuanzhou/index.html"
+        aria-label="继续向下进入超卷轴"
+      >
+        <span>继续向下</span>
+        <span class="edge-arrow" aria-hidden="true"></span>
+      </a>
+
+      <a
+        class="scroll-boundary-link scroll-boundary-link--prev"
+        id="scrollPrevLink"
+        href="wu.html"
+        aria-label="向上滚动返回上一页"
+      >
+        <span class="edge-arrow" aria-hidden="true"></span>
+        <span>向上返回</span>
+      </a>
+
+      <div class="transition-overlay" id="transitionOverlay" aria-hidden="true">
+        <span class="transition-overlay__pane transition-overlay__pane--left" aria-hidden="true"></span>
+        <span class="transition-overlay__pane transition-overlay__pane--right" aria-hidden="true"></span>
+      </div>
+    </main>
+
+    <script>
+    (function () {
+      var link = document.getElementById('scrollPrevLink');
+      var overlay = document.getElementById('transitionOverlay');
+      var targetFile = 'wu.html';
+      var triggerDistance = 90;
+      var accumulatedDelta = 0;
+      var isNavigating = false;
+      var touchStartY = null;
+
+      if (!link || !overlay) return;
+
+      function hashParams() {
+        return new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      }
+
+      function savedReturnY() {
+        var value = Number.parseInt(hashParams().get('returnY'), 10);
+        if (Number.isFinite(value)) return Math.max(0, value);
+
+        try {
+          value = Number.parseInt(window.sessionStorage.getItem('liangshanReturnScrollY'), 10);
+          if (Number.isFinite(value)) return Math.max(0, value);
+        } catch (error) {}
+
+        return 0;
+      }
+
+      function atTop() {
+        return (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+      }
+
+      function buildTargetHref() {
+        var params = new URLSearchParams();
+        params.set('scrollY', String(savedReturnY()));
+        params.set('transition', 'split');
+        return targetFile + '#' + params.toString();
+      }
+
+      function revealIncomingTransition() {
+        if (hashParams().get('transition') !== 'split') return;
+
+        overlay.classList.add('is-visible');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            overlay.classList.add('is-revealing');
+          });
+        });
+
+        window.setTimeout(function () {
+          overlay.classList.remove('is-visible', 'is-revealing');
+        }, 820);
+      }
+
+      function updateLinkVisibility() {
+        link.classList.toggle('is-visible', atTop() && !isNavigating);
+      }
+
+      function startNavigation() {
+        if (isNavigating) return;
+
+        isNavigating = true;
+        link.href = buildTargetHref();
+        link.classList.remove('is-visible');
+        overlay.classList.remove('is-revealing');
+        overlay.classList.add('is-visible');
+
+        window.setTimeout(function () {
+          link.click();
+        }, 780);
+      }
+
+      link.addEventListener('click', function (event) {
+        if (isNavigating) return;
+
+        event.preventDefault();
+        startNavigation();
+      });
+
+      window.addEventListener('wheel', function (event) {
+        if (isNavigating) return;
+
+        if (!atTop() || event.deltaY >= 0) {
+          accumulatedDelta = 0;
+          updateLinkVisibility();
+          return;
+        }
+
+        accumulatedDelta += Math.abs(event.deltaY);
+        if (accumulatedDelta >= triggerDistance) {
+          event.preventDefault();
+          startNavigation();
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchstart', function (event) {
+        touchStartY = event.touches && event.touches.length ? event.touches[0].clientY : null;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', function (event) {
+        if (isNavigating || touchStartY === null || !event.touches || !event.touches.length) return;
+
+        var touchDelta = event.touches[0].clientY - touchStartY;
+        if (atTop() && touchDelta > 64) {
+          event.preventDefault();
+          startNavigation();
+        }
+      }, { passive: false });
+
+      window.addEventListener('scroll', updateLinkVisibility, { passive: true });
+      window.addEventListener('resize', updateLinkVisibility);
+
+      link.href = buildTargetHref();
+      revealIncomingTransition();
+      updateLinkVisibility();
+    })();
+    </script>
+
+    <script>
+    (function () {
+      var nextLink = document.getElementById('scrollNextLink');
+      var overlay = document.getElementById('transitionOverlay');
+      var targetFile = '../../chaojuanzhou/index.html';
+      var bottomTriggerDelta = 140;
+      var bottomEpsilon = 4;
+      var transitionDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 780;
+      var bottomScrollIntent = 0;
+      var started = false;
+      var lastTouchY = null;
+
+      if (!nextLink || !overlay) return;
+
+      function getViewportHeight() {
+        return window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      }
+
+      function getScrollTop() {
+        return window.scrollY || document.documentElement.scrollTop || 0;
+      }
+
+      function getDocumentHeight() {
+        var doc = document.documentElement;
+        var body = document.body;
+        return Math.max(
+          doc.scrollHeight,
+          doc.offsetHeight,
+          body ? body.scrollHeight : 0,
+          body ? body.offsetHeight : 0
+        );
+      }
+
+      function isAtBottom() {
+        return getScrollTop() + getViewportHeight() >= getDocumentHeight() - bottomEpsilon;
+      }
+
+      function resetBottomIntent() {
+        bottomScrollIntent = 0;
+      }
+
+      function normalizeWheelDelta(event) {
+        var linePx = 16;
+        var pagePx = getViewportHeight() * 0.9;
+        if (event.deltaMode === 1) return event.deltaY * linePx;
+        if (event.deltaMode === 2) return event.deltaY * pagePx;
+        return event.deltaY;
+      }
+
+      function hashParams() {
+        return new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      }
+
+      function buildNextHref() {
+        var params = new URLSearchParams();
+        var returnY = Math.max(0, Math.round(getScrollTop()));
+        params.set('scrollY', String(returnY));
+        params.set('transition', 'split');
+        try {
+          window.sessionStorage.setItem('liangshanWu2ReturnY', String(returnY));
+        } catch (e) {}
+        return targetFile + '#' + params.toString();
+      }
+
+      function revealIncomingTransition() {
+        if (hashParams().get('transition') !== 'split') return;
+        overlay.classList.add('is-visible');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            overlay.classList.add('is-revealing');
+          });
+        });
+        window.setTimeout(function () {
+          overlay.classList.remove('is-visible', 'is-revealing');
+        }, transitionDelay + 40);
+      }
+
+      function restoreScrollFromHash() {
+        var value = Number.parseInt(hashParams().get('scrollY'), 10);
+        if (!Number.isFinite(value)) return;
+        function doRestore() {
+          window.scrollTo(0, Math.max(0, value));
+          resetBottomIntent();
+          updateLinkVisibility();
+        }
+        if (document.readyState === 'complete') {
+          requestAnimationFrame(doRestore);
+        } else {
+          window.addEventListener('load', function () {
+            requestAnimationFrame(doRestore);
+          }, { once: true });
+        }
+      }
+
+      function scrollToBottomIfNeeded() {
+        if (hashParams().get('scrollTo') !== 'bottom') return;
+        var hasTransition = hashParams().get('transition') === 'split';
+        var delay = hasTransition ? (transitionDelay + 120) : 0;
+        function doScroll() {
+          var docH = getDocumentHeight();
+          var vpH = getViewportHeight();
+          window.scrollTo(0, Math.max(0, docH - vpH));
+          resetBottomIntent();
+          updateLinkVisibility();
+        }
+        function scheduleScroll() {
+          if (document.readyState === 'complete') {
+            requestAnimationFrame(doScroll);
+          } else {
+            window.addEventListener('load', function () {
+              requestAnimationFrame(doScroll);
+            }, { once: true });
+          }
+        }
+        if (delay > 0) {
+          window.setTimeout(scheduleScroll, delay);
+        } else {
+          scheduleScroll();
+        }
+      }
+
+      function updateLinkVisibility() {
+        if (nextLink) {
+          nextLink.classList.toggle('is-visible', isAtBottom() && !started);
+        }
+      }
+
+      function startNextTransition() {
+        if (started) return;
+        started = true;
+        resetBottomIntent();
+        nextLink.href = buildNextHref();
+        nextLink.classList.remove('is-visible');
+        overlay.classList.remove('is-revealing');
+        overlay.classList.add('is-visible');
+        window.setTimeout(function () {
+          nextLink.click();
+        }, transitionDelay);
+      }
+
+      function registerBottomScrollIntent(deltaY, event) {
+        if (started) return;
+        if (deltaY <= 0 || !isAtBottom()) {
+          resetBottomIntent();
+          updateLinkVisibility();
+          return;
+        }
+        if (event) event.preventDefault && event.preventDefault();
+        bottomScrollIntent += Math.min(Math.abs(deltaY), 120);
+        if (bottomScrollIntent >= bottomTriggerDelta) {
+          startNextTransition();
+        }
+      }
+
+      nextLink.addEventListener('click', function (event) {
+        if (started) return;
+        event.preventDefault();
+        startNextTransition();
+      });
+
+      window.addEventListener('wheel', function (event) {
+        registerBottomScrollIntent(normalizeWheelDelta(event), event);
+      }, { passive: false });
+
+      window.addEventListener('touchstart', function (event) {
+        lastTouchY = event.touches && event.touches.length ? event.touches[0].clientY : null;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', function (event) {
+        if (started || lastTouchY === null || !event.touches || !event.touches.length) return;
+        var currentY = event.touches[0].clientY;
+        var deltaY = lastTouchY - currentY;
+        lastTouchY = currentY;
+        registerBottomScrollIntent(deltaY, event);
+      }, { passive: false });
+
+      window.addEventListener('scroll', function () {
+        if (!isAtBottom()) resetBottomIntent();
+        updateLinkVisibility();
+      }, { passive: true });
+
+      window.addEventListener('resize', function () {
+        resetBottomIntent();
+        updateLinkVisibility();
+      });
+
+      restoreScrollFromHash();
+      revealIncomingTransition();
+      scrollToBottomIfNeeded();
+      updateLinkVisibility();
+    })();
+    </script>
+
+    <script>
+    (function () {
+      var chart = document.getElementById('gepInteractiveChart');
+      var insight = document.getElementById('chartInsight');
+      if (!chart || !insight) return;
+
+      var title = insight.querySelector('h2');
+      var stats = insight.querySelector('.insight-stats');
+      var note = insight.querySelector('.insight-note');
+      var hotspots = Array.prototype.slice.call(chart.querySelectorAll('.chart-hotspot'));
+
+      function hideInsight() {
+        hotspots.forEach(function (item) {
+          item.classList.remove('is-active');
+          item.setAttribute('aria-expanded', 'false');
+        });
+
+        insight.classList.remove('is-visible');
+      }
+
+      function showInsight(button) {
+        hotspots.forEach(function (item) {
+          item.classList.toggle('is-active', item === button);
+          item.setAttribute('aria-expanded', item === button ? 'true' : 'false');
+        });
+
+        title.textContent = button.dataset.title;
+        stats.textContent = button.dataset.gep + '｜' + button.dataset.ratio;
+        note.textContent = button.dataset.note;
+        insight.classList.add('is-visible');
+      }
+
+      chart.addEventListener('mouseleave', hideInsight);
+      chart.addEventListener('focusout', function (event) {
+        if (!chart.contains(event.relatedTarget)) {
+          hideInsight();
+        }
+      });
+
+      hotspots.forEach(function (button) {
+        button.addEventListener('mouseenter', function () {
+          showInsight(button);
+        });
+        button.addEventListener('mouseleave', hideInsight);
+        button.addEventListener('focus', function () {
+          showInsight(button);
+        });
+        button.addEventListener('click', function () {
+          showInsight(button);
+        });
+      });
+    })();
+    </script>    <script>
+(function () {
+  var sphere = document.querySelector('.catalog-sphere');
+  if (!sphere) return;
+  var toggle = sphere.querySelector('.cs-toggle');
+  var panel = sphere.querySelector('.cs-panel');
+  var backdrop = document.querySelector('.cs-backdrop');
+  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
+  var isOpen = false;
+
+  // 标记当前章节
+  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
+  items.forEach(function (item) {
+    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
+      item.classList.add('is-current');
+      item.setAttribute('aria-current', 'page');
+    }
+  });
+
+  function open() {
+    if (isOpen) return;
+    isOpen = true;
+    sphere.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    sphere.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen ? close() : open();
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', function () { close(); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (isOpen && !sphere.contains(e.target)) {
+      close();
+    }
+  });
+
+  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
+  items.forEach(function (item) {
+    item.addEventListener('click', function (e) {
+      var href = item.getAttribute('href') || '';
+      if (href.indexOf('#') === 0) {
+        e.preventDefault();
+        close();
+        if (href.length > 1) {
+          setTimeout(function () {
+            var el = document.getElementById(href.substring(1));
+            if (el) {
+              var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
+              window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+          }, 350);
+        }
+      } else {
+        close();
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) {
+      close();
+      toggle.focus();
+    }
+  });
+})();
+    </script>
+
+  </body>
+</html>

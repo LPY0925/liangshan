@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绿水青山超卷轴</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <style>
+/* ── 目录球 ── */
+.catalog-sphere,
+.catalog-sphere *,
+.catalog-sphere *::before,
+.catalog-sphere *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-sphere {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "\601D\6E90\5B8B\4F53", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.cs-toggle {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-toggle:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.catalog-sphere.is-open .cs-toggle {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+  box-shadow: 0 4px 20px rgba(31, 42, 32, 0.22);
+}
+
+.cs-icon {
+  width: 18px;
+  height: 13px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cs-bar {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.catalog-sphere.is-open .cs-bar:nth-child(1) {
+  transform: translateY(5.75px) rotate(45deg);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.5);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(3) {
+  transform: translateY(-5.75px) rotate(-45deg);
+}
+
+.cs-panel {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 278px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(248, 243, 234, 0.96);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(179, 149, 88, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 18px 52px rgba(31, 42, 32, 0.18);
+  padding: 10px 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.97);
+  transition:
+    opacity .32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform .32s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility .32s;
+}
+
+.catalog-sphere.is-open .cs-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.cs-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.cs-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cs-panel::-webkit-scrollbar-thumb {
+  background: rgba(179, 149, 88, 0.2);
+  border-radius: 2px;
+}
+
+.cs-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #3a4e3a;
+  transition: background .2s ease;
+}
+
+.cs-item:hover {
+  background: rgba(138, 159, 99, 0.1);
+}
+
+.cs-item.is-current {
+  background: rgba(138, 159, 99, 0.14);
+  cursor: default;
+}
+
+.cs-item.is-current:hover {
+  background: rgba(138, 159, 99, 0.18);
+}
+
+.cs-thumb {
+  width: 68px;
+  height: 44px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid rgba(179, 149, 88, 0.18);
+  flex-shrink: 0;
+  background: #e8e2d6;
+}
+
+.cs-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .5px;
+}
+
+.cs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .32s;
+}
+
+.catalog-sphere.is-open ~ .cs-backdrop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .catalog-sphere {
+    top: 12px;
+    left: 12px;
+  }
+  .cs-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .cs-panel {
+    top: 48px;
+    width: calc(100vw - 32px);
+    max-width: 278px;
+  }
+}
+    </style>
+
+    <!-- 省份图片灯箱 -->
+    <style>
+.region-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200000;
+  background: rgba(7, 18, 15, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 32px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.region-lightbox.is-open {
+  display: flex;
+  opacity: 1;
+}
+
+.region-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  color: rgba(244,247,239,0.7);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s, color 0.25s, transform 0.25s;
+}
+
+.region-lightbox-close:hover {
+  background: rgba(255,255,255,0.14);
+  color: #f4f7ef;
+  transform: scale(1.08);
+}
+
+.region-lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 14px;
+  box-shadow: 0 28px 72px rgba(0,0,0,0.55);
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(0.94) translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.region-lightbox.is-open .region-lightbox-img {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.region-lightbox-caption {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e8d48c;
+  letter-spacing: 2px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s 0.12s ease, transform 0.4s 0.12s ease;
+}
+
+.region-lightbox.is-open .region-lightbox-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.region-lightbox-tagline {
+  margin-top: 8px;
+  font-size: 14px;
+  color: rgba(232,212,140,0.7);
+  font-style: italic;
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s 0.2s ease, transform 0.4s 0.2s ease;
+}
+
+.region-lightbox.is-open .region-lightbox-tagline {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.region-lightbox-eco {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s 0.28s ease, transform 0.4s 0.28s ease;
+}
+
+.region-lightbox.is-open .region-lightbox-eco {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.region-lightbox-eco span {
+  background: rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: rgba(244,247,239,0.7);
+}
+
+.region-lightbox-eco strong { font-weight: 700; }
+.region-lightbox-eco .num-eco { color: #7bd2c2; }
+.region-lightbox-eco .num-two { color: #d9b86c; }
+.region-lightbox-eco .num-total { color: #ffffff; }
+
+@media (max-width: 600px) {
+  .region-lightbox { padding: 20px; }
+  .region-lightbox-img { max-height: 60vh; max-width: 100vw; border-radius: 10px; }
+  .region-lightbox-caption { font-size: 16px; }
+  .region-lightbox-eco { flex-wrap: wrap; justify-content: center; }
+}
+    </style>
+</head>
+
+<body>
+    <!-- 目录球 -->
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="陆">
+      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
+        <span class="cs-icon" aria-hidden="true">
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+          <span class="cs-bar"></span>
+        </span>
+      </button>
+      <div class="cs-panel" aria-hidden="true">
+        <a class="cs-item" href="../shouye/dist/index.html" data-chapter="开篇">
+          <img class="cs-thumb" src="../images/nav/开篇.png" alt="">
+          <span class="cs-label">开篇</span>
+        </a>
+        <a class="cs-item" href="../shouye/dist/index.html#chapter-1" data-chapter="壹">
+          <img class="cs-thumb" src="../images/nav/壹.png" alt="">
+          <span class="cs-label">壹 · 第一个坐标</span>
+        </a>
+        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
+          <img class="cs-thumb" src="../images/nav/贰.png" alt="">
+          <span class="cs-label">贰 · 青山为凭</span>
+        </a>
+        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
+          <img class="cs-thumb" src="../images/nav/叁.png" alt="">
+          <span class="cs-label">叁 · 碧空为证</span>
+        </a>
+        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
+          <img class="cs-thumb" src="../images/nav/肆.png" alt="">
+          <span class="cs-label">肆 · 清流为鉴</span>
+        </a>
+        <a class="cs-item" href="../shouye/dist/wu.html" data-chapter="伍">
+          <img class="cs-thumb" src="../images/nav/伍.png" alt="">
+          <span class="cs-label">伍 · 一棵树值多少钱？</span>
+        </a>
+        <a class="cs-item" href="#" data-chapter="陆">
+          <img class="cs-thumb" src="../images/nav/陆.png" alt="">
+          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
+        </a>
+      </div>
+    </nav>
+    <div class="cs-backdrop" aria-hidden="true"></div>
+
+    <section class="intro-mask" id="introMask" aria-label="绿色坐标开场介绍">
+        <div class="intro-mask-cursor-glow" id="introMaskCursorGlow" aria-hidden="true"></div>
+        <div class="intro-copy">
+            <h1>陆 · 675+331，1006 个绿色坐标</h1>
+            <p>从浙北的一个小山村出发，绿水青山就是金山银山的理念走过了二十年。</p>
+            <p>这二十年里，中国生态文明建设的"榜样的力量"正在从点状走向网络。国家生态文明建设示范市县、山水林田湖草沙一体化保护修复工程、两山实践创新基地、国家公园、美丽河湖建设……</p>
+            <p>我们将所有这些"两山"实践的标志性地点和工程，汇总到一张图上——1006 个绿色坐标。</p>
+            <p>它们分布在中国 31 个省区市，覆盖不同类型的生态区域——从江南水乡到西北荒漠，从东北林海到青藏高原。</p>
+            <p>每一个坐标，都代表着一个地方找到了自己的绿色转型路径。</p>
+        </div>
+    </section>
+
+    <div class="region-map-bg" aria-label="中国文旅资源地图背景">
+        <div id="regionMapBg"></div>
+    </div>
+
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    <div class="noise"></div>
+
+    <div class="hud">
+        <div class="hud-top">
+            <span>FPS: <strong id="fps">60</strong></span>
+        </div>
+        <div class="hud-bottom">
+            <span>TWO MOUNTAINS</span>
+        </div>
+    </div>
+
+    <main class="viewport" id="viewport" aria-label="绿水青山主题超卷轴">
+        <div class="world" id="world"></div>
+    </main>
+
+    <div class="left-coordinate-column" aria-label="675+331，1006 个绿色坐标">
+        <button class="coordinate-trigger" type="button" aria-expanded="false" aria-controls="coordinateInfoCard">
+            <span>675+331，1006个绿色坐标</span>
+            <span class="coordinate-click-cue" aria-hidden="true">点击</span>
+        </button>
+        <span></span>
+    </div>
+
+    <aside class="coordinate-info-card" id="coordinateInfoCard" aria-live="polite" aria-hidden="true">
+        <p>675 个生态文明建设示范区 + 331 个"绿水青山就是金山银山"实践创新基地，都是生态环境部从 2017 年起分批评定的，截至 2025 年 12 月第十届生态文明论坛刚好凑到 1006 个。</p>
+    </aside>
+
+    <section class="outro-panel" id="outroPanel" aria-label="绿色坐标收束文案" aria-hidden="true">
+        <div class="outro-copy">
+            <p>这 1006 个绿色坐标，丈量的不只是生态变化的尺度。</p>
+            <p>它们也丈量着发展的逻辑——从"向自然索取"到"与自然共生"。</p>
+            <p>它们也丈量着时间的厚度——从"牺牲环境换发展"到"保护好环境就是发展"。</p>
+            <p>它们更丈量着人和自然的关系——从"征服"到"和谐"，从"两难"到"双赢"。</p>
+            <p>二十年前，余村关矿的那一天，有人觉得这个村子"完了"。</p>
+             <p>二十年后，我们发现——它其实是开始。</p>
+        </div>
+    </section>
+
+    <section class="credit-section" id="creditSection" aria-label="制作者与指导老师">
+        <p class="credit-maker">制作者：李培源 刘安婷</p>
+        <p class="credit-label">指 导 老 师</p>
+        <p class="credit-teachers">申琳老师&emsp;李明玉老师&emsp;段洁老师&emsp;陈昊炜老师&emsp;许百静老师</p>
+    </section>
+
+    <div class="scroll-proxy"></div>
+
+    <a
+      class="scroll-boundary-link scroll-boundary-link--prev"
+      id="scrollReturnLink"
+      href="../shouye/dist/wu2.html"
+      aria-label="向上滚动返回 GEP 章节"
+    >
+      <span class="edge-arrow" aria-hidden="true"></span>
+      <span>向上返回</span>
+    </a>
+
+    <div class="transition-overlay" id="transitionOverlay" aria-hidden="true">
+      <span class="transition-overlay__pane transition-overlay__pane--left" aria-hidden="true"></span>
+      <span class="transition-overlay__pane transition-overlay__pane--right" aria-hidden="true"></span>
+    </div>
+
+    <!-- 省份图片灯箱 -->
+    <div class="region-lightbox" id="regionLightbox" aria-hidden="true" role="dialog" aria-modal="true">
+      <button class="region-lightbox-close" id="regionLightboxClose" type="button" aria-label="关闭">&times;</button>
+      <img class="region-lightbox-img" id="regionLightboxImg" src="" alt="">
+      <div class="region-lightbox-caption" id="regionLightboxCaption"></div>
+      <div class="region-lightbox-tagline" id="regionLightboxTagline"></div>
+      <div class="region-lightbox-eco" id="regionLightboxEco"></div>
+    </div>
+
+    <script src="./script.js"></script>
+
+    <script>
+    (function () {
+      var returnLink = document.getElementById('scrollReturnLink');
+      var overlay = document.getElementById('transitionOverlay');
+      var targetFile = '../shouye/dist/wu2.html';
+      var topTriggerDelta = 140;
+      var topEpsilon = 4;
+      var transitionDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 780;
+      var topScrollIntent = 0;
+      var started = false;
+      var lastTouchY = null;
+
+      if (!returnLink || !overlay) return;
+
+      function isAtTop() {
+        return (window.scrollY || 0) <= topEpsilon;
+      }
+
+      function resetTopIntent() {
+        topScrollIntent = 0;
+      }
+
+      function normalizeWheelDelta(event) {
+        var linePx = 16;
+        var pagePx = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.9;
+        if (event.deltaMode === 1) return event.deltaY * linePx;
+        if (event.deltaMode === 2) return event.deltaY * pagePx;
+        return event.deltaY;
+      }
+
+      function hashParams() {
+        return new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      }
+
+      function buildReturnHref() {
+        var params = new URLSearchParams();
+        params.set('transition', 'split');
+        params.set('scrollTo', 'bottom');
+        return targetFile + '#' + params.toString();
+      }
+
+      function revealIncomingTransition() {
+        if (hashParams().get('transition') !== 'split') return;
+        overlay.classList.add('is-visible');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            overlay.classList.add('is-revealing');
+          });
+        });
+        window.setTimeout(function () {
+          overlay.classList.remove('is-visible', 'is-revealing');
+        }, transitionDelay + 40);
+      }
+
+      function updateLinkVisibility() {
+        if (returnLink) {
+          returnLink.classList.toggle('is-visible', isAtTop() && !started);
+        }
+      }
+
+      function startReturnTransition() {
+        if (started) return;
+        started = true;
+        resetTopIntent();
+        returnLink.href = buildReturnHref();
+        returnLink.classList.remove('is-visible');
+        overlay.classList.remove('is-revealing');
+        overlay.classList.add('is-visible');
+        window.setTimeout(function () {
+          returnLink.click();
+        }, transitionDelay);
+      }
+
+      function registerTopScrollIntent(deltaY, event) {
+        if (started) return;
+        if (deltaY >= 0 || !isAtTop()) {
+          resetTopIntent();
+          updateLinkVisibility();
+          return;
+        }
+        if (event) event.preventDefault && event.preventDefault();
+        topScrollIntent += Math.min(Math.abs(deltaY), 120);
+        if (topScrollIntent >= topTriggerDelta) {
+          startReturnTransition();
+        }
+      }
+
+      returnLink.addEventListener('click', function (event) {
+        if (started) return;
+        event.preventDefault();
+        startReturnTransition();
+      });
+
+      window.addEventListener('wheel', function (event) {
+        registerTopScrollIntent(normalizeWheelDelta(event), event);
+      }, { passive: false });
+
+      window.addEventListener('touchstart', function (event) {
+        lastTouchY = event.touches && event.touches.length ? event.touches[0].clientY : null;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', function (event) {
+        if (started || lastTouchY === null || !event.touches || !event.touches.length) return;
+        var currentY = event.touches[0].clientY;
+        var deltaY = lastTouchY - currentY;
+        lastTouchY = currentY;
+        registerTopScrollIntent(deltaY, event);
+      }, { passive: false });
+
+      window.addEventListener('scroll', function () {
+        if (!isAtTop()) resetTopIntent();
+        updateLinkVisibility();
+      }, { passive: true });
+
+      window.addEventListener('resize', function () {
+        resetTopIntent();
+        updateLinkVisibility();
+      });
+
+      revealIncomingTransition();
+      updateLinkVisibility();
+    })();
+    </script>
+
+    <script>
+(function () {
+  var sphere = document.querySelector('.catalog-sphere');
+  if (!sphere) return;
+  var toggle = sphere.querySelector('.cs-toggle');
+  var panel = sphere.querySelector('.cs-panel');
+  var backdrop = document.querySelector('.cs-backdrop');
+  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
+  var isOpen = false;
+
+  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
+  items.forEach(function (item) {
+    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
+      item.classList.add('is-current');
+      item.setAttribute('aria-current', 'page');
+    }
+  });
+
+  function open() {
+    if (isOpen) return;
+    isOpen = true;
+    sphere.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    sphere.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen ? close() : open();
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', function () { close(); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (isOpen && !sphere.contains(e.target)) {
+      close();
+    }
+  });
+
+  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
+  items.forEach(function (item) {
+    item.addEventListener('click', function (e) {
+      var href = item.getAttribute('href') || '';
+      if (href.indexOf('#') === 0) {
+        e.preventDefault();
+        close();
+        if (href.length > 1) {
+          setTimeout(function () {
+            var el = document.getElementById(href.substring(1));
+            if (el) {
+              var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
+              window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+          }, 350);
+        }
+      } else {
+        close();
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) {
+      close();
+      toggle.focus();
+    }
+  });
+})();
+    </script>
+
+  </body>
+
+</html>

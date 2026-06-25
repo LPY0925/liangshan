@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">全国GEP核算试点实例双轴对比图</title>
+  <desc id="desc">深圳、巴中、丽水、琼中的GEP规模和GEP与GDP倍数对比，右轴为GEP亿元，左轴为GEP与GDP倍数。</desc>
+  <defs>
+    <linearGradient id="barGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#76a67f"/>
+      <stop offset="100%" stop-color="#2f6f59"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7fbf5"/>
+      <stop offset="58%" stop-color="#edf6ee"/>
+      <stop offset="100%" stop-color="#dfece4"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#23301f" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="760" rx="18" fill="none"/>
+  <circle cx="170" cy="118" r="160" fill="#ffffff" opacity="0"/>
+  <circle cx="980" cy="104" r="210" fill="#dff1ec" opacity="0"/>
+
+  <text x="82" y="78" fill="#223829" font-family="'Noto Serif SC','Source Han Serif SC','SimSun',serif" font-size="34" font-weight="700">全国GEP核算试点实例</text>
+  <text x="82" y="116" fill="#506756" font-family="'Noto Serif SC','Source Han Serif SC','SimSun',serif" font-size="18">双轴对比：生态产品总值规模与相对GDP倍数</text>
+
+  <g font-family="'Noto Serif SC','Source Han Serif SC','SimSun',serif" font-size="15">
+    <rect x="740" y="62" width="22" height="14" rx="3" fill="url(#barGreen)"/>
+    <text x="774" y="75" fill="#405546">GEP规模（亿元，右轴）</text>
+    <path d="M930 69 L976 69" fill="none" stroke="#b65b3b" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="953" cy="69" r="5" fill="#b65b3b"/>
+    <text x="988" y="75" fill="#405546">GEP/GDP倍数（左轴）</text>
+  </g>
+
+  <rect x="78" y="138" width="1042" height="470" rx="16" fill="none" opacity="0"/>
+
+  <g font-family="'Noto Serif SC','Source Han Serif SC','SimSun',serif">
+    <text x="98" y="154" fill="#5b6e5e" font-size="14">GEP/GDP（倍）</text>
+    <text x="1018" y="154" fill="#5b6e5e" font-size="14" text-anchor="end">GEP（亿元）</text>
+
+    <g stroke="#d7e2d7" stroke-width="1">
+      <line x1="130" y1="160" x2="1020" y2="160"/>
+      <line x1="130" y1="260" x2="1020" y2="260"/>
+      <line x1="130" y1="360" x2="1020" y2="360"/>
+      <line x1="130" y1="460" x2="1020" y2="460"/>
+      <line x1="130" y1="560" x2="1020" y2="560"/>
+    </g>
+
+    <g fill="#667766" font-size="14">
+      <text x="116" y="165" text-anchor="end">16</text>
+      <text x="116" y="265" text-anchor="end">12</text>
+      <text x="116" y="365" text-anchor="end">8</text>
+      <text x="116" y="465" text-anchor="end">4</text>
+      <text x="116" y="565" text-anchor="end">0</text>
+      <text x="1038" y="165">5200</text>
+      <text x="1038" y="265">3900</text>
+      <text x="1038" y="365">2600</text>
+      <text x="1038" y="465">1300</text>
+      <text x="1038" y="565">0</text>
+    </g>
+
+    <g stroke="#90a18f" stroke-width="1.4">
+      <line x1="130" y1="160" x2="130" y2="560"/>
+      <line x1="1020" y1="160" x2="1020" y2="560"/>
+      <line x1="130" y1="560" x2="1020" y2="560"/>
+    </g>
+
+    <g>
+      <rect x="202" y="455" width="76" height="105" rx="8" fill="url(#barGreen)"/>
+      <rect x="422" y="405" width="76" height="155" rx="8" fill="url(#barGreen)"/>
+      <rect x="642" y="174" width="76" height="386" rx="8" fill="url(#barGreen)"/>
+      <rect x="862" y="469" width="76" height="91" rx="8" fill="url(#barGreen)"/>
+    </g>
+
+    <g fill="#2d4836" font-size="16" font-weight="600" text-anchor="middle">
+      <text x="240" y="441">1,363.87</text>
+      <text x="460" y="391">2,010.75</text>
+      <text x="680" y="160">5,024.47</text>
+      <text x="900" y="455">1,184.83</text>
+    </g>
+
+    <path d="M240 559 L460 492 L680 470 L900 162" fill="none" stroke="#b65b3b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#b65b3b" stroke="#fffaf0" stroke-width="4">
+      <circle cx="240" cy="559" r="8"/>
+      <circle cx="460" cy="492" r="8"/>
+      <circle cx="680" cy="470" r="8"/>
+      <circle cx="900" cy="162" r="8"/>
+    </g>
+
+    <g fill="#8b3f29" font-size="17" font-weight="700" text-anchor="middle">
+      <text x="240" y="540">0.04倍</text>
+      <text x="460" y="477">2.71倍</text>
+      <text x="680" y="455">3.60倍</text>
+      <text x="900" y="146">15.91倍</text>
+    </g>
+
+    <g fill="#35483a" font-size="17" font-weight="700" text-anchor="middle">
+      <text x="240" y="594">深圳</text>
+      <text x="240" y="620" font-size="14" font-weight="500" fill="#657466">2021</text>
+      <text x="460" y="594">巴中</text>
+      <text x="460" y="620" font-size="14" font-weight="500" fill="#657466">2021</text>
+      <text x="680" y="594">丽水</text>
+      <text x="680" y="620" font-size="14" font-weight="500" fill="#657466">2018</text>
+      <text x="900" y="594">琼中</text>
+      <text x="900" y="620" font-size="14" font-weight="500" fill="#657466">2023</text>
+    </g>
+
+    <text x="82" y="665" fill="#4f6554" font-size="15">注：各地公开GEP核算年份不同，倍数按同年度GDP或公开报道倍数计算；GEP为生态产品总值。</text>
+    <text x="82" y="694" fill="#5f7464" font-size="13">数据来源：深圳市生态环境局/统计局、丽水GEP核算报告与人民网、经济日报/光明网、巴中市统计局、琼中新闻发布会/统计公报、国家统计局。</text>
+  </g>
+</svg>

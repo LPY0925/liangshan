@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>两山理论宣传海报｜翻转立方体</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css?v=copy-v3">
+  </head>
+
+  <body>
+    <div id="scene">
+      <div id="cube">
+        <div class="face" data-face="top" data-i="0"><span class="face-ph">TOP</span></div>
+        <div class="face" data-face="front" data-i="1"><span class="face-ph">FRONT</span></div>
+        <div class="face" data-face="right" data-i="2"><span class="face-ph">RIGHT</span></div>
+        <div class="face" data-face="back" data-i="3"><span class="face-ph">BACK</span></div>
+        <div class="face" data-face="left" data-i="4"><span class="face-ph">LEFT</span></div>
+        <div class="face" data-face="bottom" data-i="5"><span class="face-ph">BOTTOM</span></div>
+      </div>
+    </div>
+
+    <div id="hud">
+      <div id="hud_pct">000%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="prog_fill"></div>
+      </div>
+      <div class="scene-label" id="scene_name">安吉县</div>
+    </div>
+
+    <button id="theme_toggle" aria-label="切换明暗模式">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+      </svg>
+    </button>
+
+    <div id="scene_strip"></div>
+
+    <div id="face_caption">
+      <div id="face_caption_num">01</div>
+      <div id="face_caption_name">安吉县</div>
+    </div>
+
+    <div id="scroll_container">
+      <section id="s0">
+        <div class="text-card">
+          <div class="tag">一、浙江安吉县｜余村</div>
+          <h2>那一声炮响的终结</h2>
+          <p class="body-text">
+            2005年8月15日，习近平同志在余村听到矿山关闭的消息，说出那句点亮全村的话：“绿水青山就是金山银山。”余村曾是安吉“首富村”——靠炸山采石，炮声隆隆中粉尘遮天。如今废弃矿坑成了时尚露营地，2024年接待游客122万人次。那场持续了几十年的炮声，最终变成了鸟鸣。
+          </p>
+          <p class="body-text emphasis">
+            有些金山银山，原本就藏在停止掠夺的地方。
+          </p>
+          <div class="cta-row">
+            <a class="cta" href="#s1">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s1">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">二、河北塞罕坝机械林场</div>
+          <h2>三代人的绿色接力</h2>
+          <p class="body-text">
+            1962年的塞罕坝是一望无际的荒漠。三代人，半个多世纪，住马架子、喝雪水，一棵树一棵树地种。如今115万亩林海挺立，资源总价值231亿元。从“黄沙遮天日”到“林的海洋”，筑成守卫京津的绿色长城。
+          </p>
+          <p class="body-text emphasis">
+            一群人，一辈子，可以改变一个世界。时间是信念最忠实的见证者。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s0">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s2">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s2">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">三、山西右玉县</div>
+          <h2>七十年的植树接力</h2>
+          <p class="body-text">
+            “一年一场风，从春刮到冬。”70多年前，右玉第一任县委书记带领百姓在黄沙发中种下第一棵树。此后历任书记把植树当作“接力棒”，从不间断。从“绿起来”到“富起来”，右玉精神成了一种信仰。
+          </p>
+          <p class="body-text emphasis">
+            最好的政绩不是大楼，而是后人能在大树下乘凉。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s1">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s3">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s3">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">四、福建长汀县</div>
+          <h2>火焰山的重生</h2>
+          <p class="body-text">
+            “山光、水浊、田瘦、人穷”——这八个字曾写尽长汀的苦难。1999年习近平同志亲自推动水土流失治理，干部群众在裸露的山坡上挖沟种草，一干二十余年。如今森林覆盖率突破79%，荒山找回的不仅是绿色，更是一方人的尊严。
+          </p>
+          <p class="body-text emphasis">
+            大自然从不记仇，只认真心。你把荒山当亲人照料，它终会还你满目青山。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s2">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s4">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s4">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">五、广东东源县</div>
+          <h2>万绿湖的蜕变</h2>
+          <p class="body-text">
+            十万移民背井离乡，淹没良田数万公顷。当年的“新丰江水库”，如今有了一个更美的名字：万绿湖。360多个岛屿散落在370平方公里的水面，水质保持国家Ⅰ类标准。从工程到生态，从水库到万绿湖，是一场思维的跃迁。
+          </p>
+          <p class="body-text emphasis">
+            有些告别是为了更好的相遇。三十万移民用乡愁换来了一湖碧水。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s3">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s5">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s5">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">六、陕西留坝县</div>
+          <h2>秦岭深处的“两山公司”</h2>
+          <p class="body-text">
+            留坝人曾经守着宝山不识宝。后来他们成立了全省首家“两山公司”，把4375个生态资源盘活成293个“资源包”，溪水、竹林、老屋都能“入股分红”。秦岭从来不是屏障，而是靠山。
+          </p>
+          <p class="body-text emphasis">
+            最珍贵的资源，往往是你已经拥有却视而不见的东西。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s4">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s6">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s6">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">七、安徽旌德县</div>
+          <h2>空气也能卖钱</h2>
+          <p class="body-text">
+            2021年，庙首林场以14.57万元交易了3036吨二氧化碳排放权——安徽省首笔林业碳汇交易。旌德还成立了全省首家“两山合作社”，颁发全国首本《生态资源受益权证》。祖祖辈辈“不值钱”的山林空气，突然有了标价。
+          </p>
+          <p class="body-text emphasis">
+            在生态时代，最无价的，往往就是最有价的。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s5">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s7">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s7">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">八、江西靖安县</div>
+          <h2>秘境里的生存智慧</h2>
+          <p class="body-text">
+            靖安，森林覆盖率84.1%，25度的夏天，飞瀑竹海。他们没有急于把“秘境”变成“景区”，而是让生态本身成为品牌——漂流、桨板、冷泉民宿。不卖门票，卖体验；不毁山林，借风景。慢，反而成了竞争力。
+          </p>
+          <p class="body-text emphasis">
+            真正的财富不是开发殆尽，而是懂得留白。让山水保持神秘，它才能永远令人向往。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s6">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s8">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s8">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">九、贵州贵阳乌当区</div>
+          <h2>城市边缘的绿色银行</h2>
+          <p class="body-text">
+            乌当守着贵阳“北大门”，森林覆盖率近60%。没有变成钢筋水泥的郊区，而是种下了林下经济、生态经果林、休闲观光农业。当别的城市在治霾时，乌当早已在卖“清新空气”。
+          </p>
+          <p class="body-text emphasis">
+            离繁华不远，离自然很近——这才是最奢侈的居住。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s7">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s9">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s9">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">十、四川九寨沟县</div>
+          <h2>童话世界的守护密码</h2>
+          <p class="body-text">
+            为了守护这片童话，九寨沟拒绝了无数破坏性开发项目。地震后，他们用了两年时间修复生态——不是为了重建，而是为了重生。九寨沟人懂得：真正的金山银山，不是一次性把童话卖完，而是让世世代代都能走进这个童话。
+          </p>
+          <p class="body-text emphasis">
+            守护比开发更需要勇气，因为守护的回报是留给子孙的整个世界。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s8">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s10">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s10">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">十一、江苏泗洪县</div>
+          <h2>在水乡寻找答案</h2>
+          <p class="body-text">
+            泗洪守着洪泽湖，退圩还湖、湿地修复、生态养殖。他们没有“靠湖吃湖”，而是把湖水当作镜子——只有当湖水清了，映照出来的才是金山银山。
+          </p>
+          <p class="body-text emphasis">
+            把绿水青山当作本金，而不是利息——这才是永续的智慧。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s9">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s11">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s11">
+        <div class="text-card right">
+          <div class="h-line"></div>
+          <div class="tag">十二、浙江湖州市</div>
+          <h2>一座城市的生态觉醒</h2>
+          <p class="body-text">
+            太湖蓝藻暴发曾让湖州蒙羞。痛定思痛，湖州全国率先划定生态红线，推行“生态账本”。从“蓝藻之痛”到“生态之美”，催生了绿色智造、乡村旅游、生态康养。转型不是退步，而是换个赛道领跑。
+          </p>
+          <p class="body-text emphasis">
+            一座城市的尊严，不在于它从不犯错，而在于它敢于重生。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s10">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+            <a class="cta" href="#s12">下一张
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="s12">
+        <div class="text-card">
+          <div class="h-line"></div>
+          <div class="tag">十三、浙江衢州市</div>
+          <h2>轻装前行</h2>
+          <p class="body-text">
+            衢州是钱塘江源头，曾经的浙江“后发地区”。没有工业污染的包袱，他们索性不背，直接从绿水青山起跑——生态工业、生态农业、生态旅游。起点低不是劣势，反而让人更接近初心。
+          </p>
+          <p class="body-text emphasis">
+            尊重自然，顺势而为——看似迂回，实则最快的捷径。
+          </p>
+          <div class="cta-row">
+            <a class="cta-back" href="#s11">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 6H1M6 11L1 6l5-5" /></svg>
+              上一张
+            </a>
+              <a class="cta home-return" href="../shouye/dist/index.html?v=home-anchor-20260622b#first-batch-base-link">返回首页
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h10M6 1l5 5-5 5" /></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="credit">
+      <a href="#s0">两山理论宣传海报</a>
+    </div>
+
+    <script src="./script.js?v=copy-v3"></script>
+  </body>
+
+</html>

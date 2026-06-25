@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>三层时间变换</title>
+    <link rel="stylesheet" href="./style.css?v=return-transition-20260623b">
+    <style>
+/* ── 目录球 ── */
+.catalog-sphere,
+.catalog-sphere *,
+.catalog-sphere *::before,
+.catalog-sphere *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.catalog-sphere {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "\601D\6E90\5B8B\4F53", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.cs-toggle {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-toggle:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.catalog-sphere.is-open .cs-toggle {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+  box-shadow: 0 4px 20px rgba(31, 42, 32, 0.22);
+}
+
+.cs-icon {
+  width: 18px;
+  height: 13px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cs-bar {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.catalog-sphere.is-open .cs-bar:nth-child(1) {
+  transform: translateY(5.75px) rotate(45deg);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.5);
+}
+.catalog-sphere.is-open .cs-bar:nth-child(3) {
+  transform: translateY(-5.75px) rotate(-45deg);
+}
+
+.cs-panel {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 278px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: rgba(248, 243, 234, 0.96);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(179, 149, 88, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 18px 52px rgba(31, 42, 32, 0.18);
+  padding: 10px 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.97);
+  transition:
+    opacity .32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform .32s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility .32s;
+}
+
+.catalog-sphere.is-open .cs-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.cs-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.cs-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cs-panel::-webkit-scrollbar-thumb {
+  background: rgba(179, 149, 88, 0.2);
+  border-radius: 2px;
+}
+
+.cs-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #3a4e3a;
+  transition: background .2s ease;
+}
+
+.cs-item:hover {
+  background: rgba(138, 159, 99, 0.1);
+}
+
+.cs-item.is-current {
+  background: rgba(138, 159, 99, 0.14);
+  cursor: default;
+}
+
+.cs-item.is-current:hover {
+  background: rgba(138, 159, 99, 0.18);
+}
+
+.cs-thumb {
+  width: 68px;
+  height: 44px;
+  border-radius: 5px;
+  object-fit: cover;
+  border: 1px solid rgba(179, 149, 88, 0.18);
+  flex-shrink: 0;
+  background: #e8e2d6;
+}
+
+.cs-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .5px;
+}
+
+.cs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .32s;
+}
+
+.catalog-sphere.is-open ~ .cs-backdrop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .catalog-sphere {
+    top: 12px;
+    left: 12px;
+  }
+  .cs-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .cs-panel {
+    top: 48px;
+    width: calc(100vw - 32px);
+    max-width: 278px;
+  }
+}
+    </style>
+
+  </head>
+    
+  <body>
+  <!-- 目录球 -->
+  <nav class="catalog-sphere" aria-label="章节目录" data-current="贰,叁,肆">
+    <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
+      <span class="cs-icon" aria-hidden="true">
+        <span class="cs-bar"></span>
+        <span class="cs-bar"></span>
+        <span class="cs-bar"></span>
+      </span>
+    </button>
+    <div class="cs-panel" aria-hidden="true">
+      <a class="cs-item" href="../shouye/dist/index.html" data-chapter="开篇">
+        <img class="cs-thumb" src="../images/nav/开篇.png" alt="">
+        <span class="cs-label">开篇</span>
+      </a>
+      <a class="cs-item" href="../shouye/dist/index.html#chapter-1" data-chapter="壹">
+        <img class="cs-thumb" src="../images/nav/壹.png" alt="">
+        <span class="cs-label">壹 · 第一个坐标</span>
+      </a>
+      <a class="cs-item" href="#chapter-2" data-chapter="贰">
+        <img class="cs-thumb" src="../images/nav/贰.png" alt="">
+        <span class="cs-label">贰 · 青山为凭</span>
+      </a>
+      <a class="cs-item" href="#chapter-3" data-chapter="叁">
+        <img class="cs-thumb" src="../images/nav/叁.png" alt="">
+        <span class="cs-label">叁 · 碧空为证</span>
+      </a>
+      <a class="cs-item" href="#chapter-4" data-chapter="肆">
+        <img class="cs-thumb" src="../images/nav/肆.png" alt="">
+        <span class="cs-label">肆 · 清流为鉴</span>
+      </a>
+      <a class="cs-item" href="../shouye/dist/wu.html" data-chapter="伍">
+        <img class="cs-thumb" src="../images/nav/伍.png" alt="">
+        <span class="cs-label">伍 · 一棵树值多少钱？</span>
+      </a>
+      <a class="cs-item" href="../chaojuanzhou/index.html" data-chapter="陆">
+        <img class="cs-thumb" src="../images/nav/陆.png" alt="">
+        <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
+      </a>
+    </div>
+  </nav>
+  <div class="cs-backdrop" aria-hidden="true"></div>
+
+  <a
+    id="home-return-link"
+    class="home-return-link"
+    href="../shouye/dist/index.html#home-before-time-transition"
+    tabindex="-1"
+    aria-label="返回首页跳转前的位置"
+  >返回首页</a>
+
+  <a
+    id="next-page-link"
+    class="scroll-boundary-link scroll-boundary-link--next"
+    href="../shouye/dist/wu.html"
+    aria-label="继续向下进入次页"
+  >
+    <span>继续向下</span>
+    <span class="edge-arrow" aria-hidden="true"></span>
+  </a>
+
+  <main>
+	<article>
+		<section>
+			<p class="scroll-indicator" id="chapter-2">贰 · 青山为凭 </p>
+		</section>
+		<section class="scroll-section">
+			<div class="comparator-container">
+				<div class="comparator-wrapper">
+					<div class="comparator">
+						<div class="comparison-percentage"></div>
+						<div class="image-layers">
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingshanweiping_01_difugaituihua.png">
+									<img src="../images/qingshanweiping_01_difugaituihua.png" decoding="async" fetchpriority="high" alt="青山为凭_01_低覆盖退化">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段一</span>
+									<div class="image-text">
+										<h2>低覆盖退化</h2>
+										<h3>山体修复前植被覆盖不足</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingshanweiping_02_youlinfusu.png">
+									<img src="../images/qingshanweiping_02_youlinfusu.png" decoding="async" fetchpriority="high" alt="青山为凭_02_幼林复苏">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段二</span>
+									<div class="image-text">
+										<h2>幼林复苏</h2>
+										<h3>新生林木开始恢复坡面</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingshanweiping_03_lindaikuozhan.png">
+									<img src="../images/qingshanweiping_03_lindaikuozhan.png" decoding="async" fetchpriority="high" alt="青山为凭_03_林带扩展">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段三</span>
+									<div class="image-text">
+										<h2>林带扩展</h2>
+										<h3>成片林带逐步连成生态屏障</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingshanweiping_04_manshanchenglin.png">
+									<img src="../images/qingshanweiping_04_manshanchenglin.png" decoding="async" fetchpriority="high" alt="青山为凭_04_满山成林">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段四</span>
+									<div class="image-text">
+										<h2>满山成林</h2>
+										<h3>群山成林生态稳定</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer image-layer--chart">
+								<div class="chart-stage" data-chart="forest" aria-label="中国森林覆盖率演进图表"></div>
+							</div>
+						</div>
+						<div class="divider-lines">
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="story-panel" data-chapter-index="0" aria-label="第二章 青山为凭"></aside>
+		</section>
+		<section>
+			<p class="scroll-indicator" id="chapter-3">叁 · 碧空为证 </p>
+		</section>
+		<section class="scroll-section">
+			<div class="comparator-container">
+				<div class="comparator-wrapper flip-reverse">
+					<div class="comparator">
+						<div class="comparison-percentage"></div>
+						<div class="image-layers">
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/bikongweizheng_01_chongduwumai.png">
+									<img src="../images/bikongweizheng_01_chongduwumai.png" decoding="async" loading="lazy" alt="碧空为证_01_重度雾霾">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段一</span>
+									<div class="image-text">
+										<h2>重度雾霾</h2>
+										<h3>污染积聚遮蔽远山</h3>
+									</div>
+
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/bikongweizheng_02_wumaizhuanbao.png">
+									<img src="../images/bikongweizheng_02_wumaizhuanbao.png" decoding="async" loading="lazy" alt="碧空为证_02_雾霾转薄">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段二</span>
+									<div class="image-text">
+										<h2>雾霾转薄</h2>
+										<h3>治理启动蓝意初现</h3>
+									</div>
+
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/bikongweizheng_03_kongqiqinglang.png">
+									<img src="../images/bikongweizheng_03_kongqiqinglang.png" decoding="async" loading="lazy" alt="碧空为证_03_空气清朗">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段三</span>
+									<div class="image-text">
+										<h2>空气清朗</h2>
+										<h3>清洁转型空气转明</h3>
+									</div>
+
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/bikongweizheng_04_bikongruxi.png">
+									<img src="../images/bikongweizheng_04_bikongruxi.png" decoding="async" loading="lazy" alt="碧空为证_04_碧空如洗">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段四</span>
+									<div class="image-text">
+										<h2>碧空如洗</h2>
+										<h3>蓝天常驻低碳共生</h3>
+									</div>
+
+								</div>
+							</div>
+							<div class="image-layer image-layer--chart">
+								<div class="chart-stage" data-chart="pm25" aria-label="全国 PM2.5 年均浓度变化图表"></div>
+							</div>
+						</div>
+						<div class="divider-lines">
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="story-panel" data-chapter-index="1" aria-label="第三章 碧空为证"></aside>
+		</section>
+		<section>
+			<p class="scroll-indicator" id="chapter-4">肆 · 清流为鉴 </p>
+		</section>
+		<section class="scroll-section">
+			<div class="comparator-container">
+				<div class="comparator-wrapper">
+					<div class="comparator">
+						<div class="comparison-percentage"></div>
+						<div class="image-layers">
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingliuweijian_01_hunzhuowuran.png">
+									<img src="../images/qingliuweijian_01_hunzhuowuran.png" decoding="async" loading="lazy" alt="清流为鉴_01_浑浊污染">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段一</span>
+									<div class="image-text">
+										<h2>浑浊污染</h2>
+										<h3>水体浑浊生态承压</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingliuweijian_02_zhilichujian.png">
+									<img src="../images/qingliuweijian_02_zhilichujian.png" decoding="async" loading="lazy" alt="清流为鉴_02_治理初见">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段二</span>
+									<div class="image-text">
+										<h2>治理初见</h2>
+										<h3>治理措施带来初步改善</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingliuweijian_03_shuisezhuanqing.png">
+									<img src="../images/qingliuweijian_03_shuisezhuanqing.png" decoding="async" loading="lazy" alt="清流为鉴_03_水色转清">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段三</span>
+									<div class="image-text">
+										<h2>水色转清</h2>
+										<h3>水岸生态逐步恢复</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer">
+								<picture>
+									<source media="(max-width: 48em)" srcset="../images/qingliuweijian_04_qingliujiandi.png">
+									<img src="../images/qingliuweijian_04_qingliujiandi.png" decoding="async" loading="lazy" alt="清流为鉴_04_清流见底">
+								</picture>
+								<div class="comparator-overlay">
+									<span class="label">阶段四</span>
+									<div class="image-text">
+										<h2>清流见底</h2>
+										<h3>水岸共生清澈常在</h3>
+									</div>
+								</div>
+							</div>
+							<div class="image-layer image-layer--chart">
+								<div class="chart-stage" data-chart="water" aria-label="全国地表水水质类别比例变化图表"></div>
+							</div>
+						</div>
+						<div class="divider-lines">
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+							<div class="divider-line"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="story-panel" data-chapter-index="2" aria-label="第四章 清流为鉴"></aside>
+		</section>
+	</article>
+</main>
+<footer>
+	<div class="links-layer">
+		<div class="links">
+			<a href="https://www.lessrain.com" target="_blank" rel="noopener">Less Rain GmbH</a>
+			<a href="https://codepen.io/collection/vOBVrG" target="_top">Codepen Challenges Collection</a>
+		</div>
+	</div>
+</footer>
+<script type="text/plain" id="story-copy">
+## 第二章｜青山为凭
+
+### 森林覆盖率：16.74%（1990年）→ ＞25%（2024年）
+
+---
+
+中国的"绿"，不是一种绿。
+
+在东南，它是山水相依的村庄、丘陵和湿地——那里的绿是湿润的、浓密的，雨水和植被缠绕在一起，分不清哪里是天上哪里是地上。在东北，它是林海雪原——大兴安岭和小兴安岭的绿是辽阔而苍劲的，冬天白雪覆盖了树冠，树干还是深色的，远远看去像一幅水墨画。在西北，它是荒漠、戈壁、风光资源和正在修复的草场——那里的绿不是慷慨的，是一片一片被种出来的，每一片都来之不易。在青藏高原，它是稀薄而珍贵的生态屏障——空气稀薄的地方，活着本身就是一件不容易的事，何况是让树活下去。在城市，它是公园、绿道、河岸和人们日常可抵达的公共空间——那些穿插在楼群之间的绿，不再是自然的残余，而是被重新邀请回来的邻居。
+
+所以，中国的绿不是一个数字。它是一种复合的、立体的、在不同土地上长成不同样子的事物。但也正因为如此，当这些不同形态的绿被放在一起算总账的时候，你会发现——这份绿色家底正在变厚。
+
+二〇二四年，全国完成造林面积四百四十五万公顷。这个数字很难想象。它不是"又多种了一些树"——它是四百四十五万公顷的土地上，每一平方米都被种下了种子、苗子，和某些人的希望。四百四十五万公顷是什么概念？它大约相当于一个瑞士的国土面积，或者七个上海。一年之内，这些树被栽进土里。
+
+而从一九九〇年的百分之十六点七四到二〇二四年的超过百分之二十五——三十四年间，森林覆盖率提升了近九个百分点。如果你觉得这不快，那是因为你不知道这背后意味着什么。中国的北方有大片的干旱和半干旱地区，那些地方的年降水量连养活一株草都不够，更不用说一棵树。在那些地方种树，不是在种，是在跟老天打赌。而它们偏偏赢了。
+
+那些树是怎么活下来的？没有奇迹。
+
+没有哪一种生态改善是靠奇迹完成的。奇迹是一个太轻的词，它暗示着某种偶然的、不可复制的好运。但如果你去问那些真正种过树的人，他们不会跟你说奇迹。他们会说：第一年死了，第二年补种；第二年死了，第三年换一个品种再种。不是什么宏大叙事，就是年复一年的重复——直到一棵树终于活下来，然后两棵，然后一片。
+
+**真正有力量的不是一次伟大的行动，而是一个不起眼的动作被重复了足够多次。**
+
+这就是森林覆盖率的意义。它不是某个决定性的数据，它是一个文明积累耐心的刻度。一代人种树，下一代人继续种，再下一代人才能在上面乘凉。你问一棵树需要多少年才能长大？答案是：一代人。你问一片森林需要多少年才能形成？答案是：三代人。比一个王朝的寿命还长。
+
+二〇二四年，中国的人工林面积全球第一。这意味着什么？意味着这片土地上的森林，有相当一部分不是天然长出来的，而是被人一棵一棵种出来的。是被那些在风沙里眯着眼睛、在冻土上哈着白气、在烈日下弯着腰的人，种出来的。
+
+**一个人把一棵树种下去的时候，他不是在种树。他是在种时间——把今天的力气换成明天的树荫，把此刻的选择兑换给一百年后才会出生的人。**
+
+这就是为什么，青山可以被作为凭据。不是因为山高，不是因为树多，而是因为山和树记录了一代又一代人做出的同一个选择——选择相信慢的力量，选择把根扎在别人不愿意扎根的地方，选择让时间成为自己的盟友而不是敌人。
+
+生态不是抽象概念。它是一棵又一棵树被种进土里的总和，是可以被观察、被衡量、被长期追踪的国家资产。你测量森林覆盖率的时候，你测量的其实是一个社会有没有耐心。而答案藏在那些正在生长的树里——它们不说话，它们只是长。
+
+青山不语。但风知道，土壤知道，那些在树荫下乘凉的后代终将知道。
+
+## 第三章｜碧空为证
+
+### 全国地级及以上城市PM2.5年均浓度：46 μg/m³（2015年）→ 29.3 μg/m³（2024年）
+
+---
+
+天空从来不说话。但它从不撒谎。
+
+你不需要相信任何人，只需要抬起头。空气是透明的——好坏都藏不住，好坏都写在里面。一个地方的空气质量，不需要任何宣言来解释，站在那里呼吸一口就知道了。在这一点上，天空是一个比任何报告都诚实的记录者。
+
+二〇一三年，有人开始做一件极其微小的事——每天在同一时间、同一位置拍一张天空的照片。他可能没想过这件事的意义。他只是觉得天空变了一个样子，他想要记住它最初的样子。起初的画面像一块褪色的灰布，云和霾裹在一起，分不清边界。后来，蓝色一点一点地渗进来了——先是试探性的、若有若无的，然后越来越浓，越来越稳。他没有做什么了不起的事，他只是坚持了一件极其微小的事，然后发现——天空真的会变。
+
+这个人的故事无关紧要。重要的是，他的相机记录下的那个过程，恰好是一个国家在做同一件事。
+
+**很多时候，我们高估了短期的变化，也低估了长期的力量。一天看不见，一个月也看不见，但十年之后回头看——一切都不一样了。不是因为发生了什么惊天动地的事情，而是因为发生了足够多的小事情。**
+
+二〇二四年，全国地级及以上城市PM2.5年平均浓度为29.3微克/立方米。这个数字意味着什么？按地级及以上城市这一口径看，它已从二〇一五年的46微克/立方米降下来；如果把目光放回二〇一三年首批74个城市的监测记录，当年的PM2.5年均浓度是七十二，北京更高达八十九点五。八十九点五是什么感觉？是一种让人不舒服的空气，一种你走到户外就能察觉到的沉闷，一种让老人和孩子不得不减少外出的空气。
+
+而每一个微克/立方米的下降，都不是免费的。它的背后是数不清的烟囱不再冒烟——那些烟囱有的属于工厂，有的属于村庄，有的属于千家万户。是以千万户为单位的"煤改气""煤改电"，意味着整个北方冬天取暖的方式被改写了一遍。是以万为单位的散乱污企业关停整治——每一个"关停"的背后，都牵扯着就业、税收和地方经济的重新布局。是钢铁行业全行业的超低排放改造——全球钢铁工业史上规模最大的环保升级。是新能源汽车从年产不足两万辆到年产量突破一千万辆——十年，六百倍的跨越。
+
+**一个经济体在高速增长的时候，可以不去想代价。但一个成熟的经济体，必须学会算总账。有些账现在不算，以后会连本带利地还。空气就是这样一笔账——你现在欠下的每一口浊气，都会被下一代人吸进去。**
+
+**干净的空气不是天上掉下来的，它是被选择出来的。每一口深呼吸的背后，都有人选择了更难走的那条路。**
+
+联合国环境规划署把这件事叫做"北京奇迹"。但这个"奇迹"其实一点都不神秘——它不是突然发生了什么不可解释的事情，而是该做的事情，终于被做了；该付出的代价，终于被付了。从不足百分之五的城市空气质量达标，到百分之六十五点五的城市达标——每一个百分点的提升，都是一座城市在能源结构、产业结构、生活方式上做出改变的结果。
+
+**世界上没有奇迹，只有不得不做的选择和不得不走的路。走完了，回过头看，才成了奇迹。**
+
+有人会问：空气看不见摸不着，为什么要为一个看不见的东西付出那么大的代价？这恰好是问题的核心——看不见的东西不等于不重要。恰恰相反，最根本的东西往往都是看不见的。呼吸是这样，信任是这样，时间也是这样。一个社会愿意为一件看不见的东西付出看得见的代价，说明它终于理解了什么是真正的成本——不是花的钱，是对后代欠下的债。
+
+**我们总是为看得见的东西买单，却总是被看不见的东西决定命运。**
+
+而天空之所以可以被作为证据，正是因为它不会说谎。你往大气里排放什么，它就给你什么天气；你减少排放，它就还你蓝色。这不是报应，这是物理。是极其简单的因果逻辑。一个国家学会了为自己的呼吸负责，天空就会给出诚实的回答。不同的是——物理定律不需要我们的相信，它只管运行。你信不信，它都在那里。
+
+生态不是抽象概念。它是可以被观察、被衡量、被长期追踪的国家资产。二〇二四年的中国天空，比二〇一三年蓝了一大截。这不是感觉，是数据。是每一台监测仪、每一个城市、每年三百六十五天的记录共同证明的事实。那些数据不会说谎，正如天空不会说谎。
+
+你怎样对待天空，它就怎样回报你。这个道理，和做人是一样的。
+
+## 第四章｜清流为鉴
+
+### 全国地表水Ⅰ至Ⅲ类水质断面比例：64.5%（2015年）→ 90.4%（2024年）
+
+---
+
+水是最诚实的。因为它不会辩解。
+
+山可以沉默，天空可以晴朗——它们的不言语有时候是一种美。但水的不言语不一样。水会变色。它会变成褐色、黄色、酱油色；它会起泡、发臭、变黑。当水被伤害的时候，它不会说"我受伤了"，它只是不再清澈。这种诚实让人不忍。
+
+长江奔流六千三百公里，养育了三分之一的中国人。它见过这个古老文明最好的时刻——李白在江上写诗，苏轼在江边饮酒，无数人在它的两岸耕种、生活、繁衍。它也见过自己最不堪的时刻——江面上漂着泡沫，河岸上堆着工业废料，江水变成浑浊的褐色。曾经，有人在江边拍下照片，发到网上，配了一行字："这不是母亲河该有的样子。"
+
+说这句话的人不知道，历史的转折就在那几年。
+
+二〇一六年，"共抓大保护、不搞大开发"——九个字。这九个字不是一句口号，它是一个国家对自己说：够了。我们走了那么远的路，现在该停下来了。
+
+**有时候，最强大的力量不是去创造什么，而是停下来。不再去做那些伤害的事，本身就是最深刻的行动。**
+
+接下来的事情，不是一个技术奇迹。它比技术更难——它是一整个社会重新学习如何与一条大河相处。超过一万家沿江化工企业被关停、改造或搬迁——这不是一个抽象的数字，这是一万家工厂的老板和工人做出的选择。六万多个排污口被逐一排查、登记、整治——每一个排污口都对应着某个具体的地方和具体的人。二十三万多渔民放下渔网，从长江上撤到岸上——他们捕了半辈子鱼，但为了让长江里的鱼能活下去，他们选择了另一种生活。
+
+这中间有一个深刻的悖论：一个靠水生存了几千年的文明，竟然在几十年间几乎毁掉了自己的水。而更深刻的是——到了某个临界点，这个文明又决定把水救回来。这个决定不是靠技术，不是靠资金，是靠一种更古老的智慧：知道自己不能做什么，比知道自己能做什么更重要。
+
+**有时候，停下来不再去毁灭，比冲锋陷阵更需要勇气。因为前者需要承认一件事——我们走错了。**
+
+长江干流从二〇二〇年起全线保持在Ⅱ类水质——"优"。五年了，从来没有掉下去过。一条被人断言"已经死了"的大河，硬生生被救了回来。不是靠运气，是靠六万多个排污口的逐一整改、靠一万多家化工企业的关改搬转、靠一部专门为它制定的法律、靠二十多万渔民的转身上岸。
+
+**水是有记忆的。它记得你给过它什么——无论是毒药还是敬意。你给河流一条生路，河流就会还你一个干净的世界。这不是交易，是这个星球最古老的法则。**
+
+全国的水质也在变好。从二〇一五年的百分之六十四点五到二〇二四年的百分之九十点四——十年间提升了超过二十五个百分点。那些曾经被叫做"黑臭河"、连鸭子都不愿游进去的河道，正在一条一条地变清。生活在河边的人最先知道这件事——不是通过数据，是通过鼻子和眼睛。异味消失了，水的颜色浅了，水面上开始出现很久没有见过的东西：有人开始钓鱼，有人在河边散步，有孩子在浅滩上追着水花跑。
+
+**一个人不能两次踏进同一条河流。但可以有一个人，在三十年后重新回到同一条河边，发现水清了。这不是哲学，这是一个国家兑现了对一条河的承诺。**
+
+我们总以为保护是要做什么——关掉工厂、铺上管道、处理污水。这些都是对的。但保护还有一个更深的维度，那就是学会不做什么。让水自己恢复，让鱼自己回来，让河自己找到原来的路。有时候，不干预是最深的尊重。因为在自然的逻辑里，人不是主角，水才是。
+
+**东南水网密布，每一条河都在被重新打量；西北的河流虽然稀少，但每一条都更加珍贵，因为水在那里是真正的稀缺品；城市的河道正在变成人们可以散步、可以停留、可以坐下的公共空间。水不再只是被排走、被处理、被用掉的东西，它正在重新成为风景的一部分，成为人们愿意停下来看一会儿的东西。**
+
+生态不是抽象概念。它是一条河从浑浊变清澈的全过程，是可以被观察、被衡量、被长期追踪的国家资产。水质优良断面比例从百分之六十四点五到百分之九十点四——每一个百分点的提升，都意味着某一条河、某一条溪、某一个曾经被遗忘的水体，重新活了过来。
+
+如果你的水是清的，你的土地就是健康的；如果你的土地是健康的，你的粮食就是安全的。水是一个文明最底层的密码——它决定了这个文明能走多远、能站多稳。当你把一条河从黑色重新变回透明的时候，你清理的不是河道，是你自己和自然之间那条早已模糊的边界。
+
+**水为鉴。鉴的不是水，是人心。**
+</script>
+    <div class="return-transition-mask" id="returnTransitionMask" aria-hidden="true">
+      <div class="return-transition-panel return-transition-panel--left"></div>
+      <div class="return-transition-panel return-transition-panel--right"></div>
+    </div>
+
+    <script src="./script.js?v=return-transition-20260623b"></script>
+
+    <script>
+(function () {
+  var sphere = document.querySelector('.catalog-sphere');
+  if (!sphere) return;
+  var toggle = sphere.querySelector('.cs-toggle');
+  var panel = sphere.querySelector('.cs-panel');
+  var backdrop = document.querySelector('.cs-backdrop');
+  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
+  var isOpen = false;
+
+  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
+  items.forEach(function (item) {
+    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
+      item.classList.add('is-current');
+      item.setAttribute('aria-current', 'page');
+    }
+  });
+
+  function open() {
+    if (isOpen) return;
+    isOpen = true;
+    sphere.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+    sphere.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+
+  toggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen ? close() : open();
+  });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', function () { close(); });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (isOpen && !sphere.contains(e.target)) {
+      close();
+    }
+  });
+
+  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
+  items.forEach(function (item) {
+    item.addEventListener('click', function (e) {
+      var href = item.getAttribute('href') || '';
+      if (href.indexOf('#') === 0) {
+        e.preventDefault();
+        close();
+        if (href.length > 1) {
+          var hash = href.substring(1);
+          setTimeout(function () {
+            if (window.__catalogScrollTo && window.__catalogScrollTo(hash)) return;
+            var el = document.getElementById(hash);
+            if (el) {
+              var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
+              window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+          }, 350);
+        }
+      } else {
+        close();
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) {
+      close();
+      toggle.focus();
+    }
+  });
+})();
+    </script>
+
+  </body>
+  
+</html>
