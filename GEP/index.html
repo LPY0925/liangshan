@@ -291,6 +291,37 @@
     .path-copy h2 { font-size: 23px; }
     .path-copy p { font-size: 14px; line-height: 1.76; }
   }
+
+/* 自动滚动按钮 */
+.auto-scroll-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(60, 130, 200, 0.85);
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  transition: background 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auto-scroll-btn:hover {
+  background: rgba(40, 100, 170, 0.95);
+  transform: scale(1.08);
+}
+.auto-scroll-btn.playing {
+  background: rgba(200, 60, 60, 0.85);
+}
+.auto-scroll-btn.playing:hover {
+  background: rgba(170, 40, 40, 0.95);
+}
 </style>
 </head>
 <body>
@@ -712,6 +743,56 @@
     });
   }, { threshold: [0, 0.2, 0.5, 0.8] });
   io.observe(wrapper);
+})();
+</script>
+
+<!-- 自动滚动按钮 -->
+<button class="auto-scroll-btn" id="autoScrollBtn" title="自动滚动">▶</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('autoScrollBtn');
+  var playing = false;
+  var timer = null;
+  var wrapper = document.querySelector('.animation-wrapper');
+  if (!wrapper) wrapper = document.body;
+
+  function getSpeed() {
+    var w = window.innerWidth;
+    if (w < 480) return 0.4;
+    if (w < 768) return 0.6;
+    return 1.0;
+  }
+
+  function step() {
+    if (!playing) return;
+    var speed = getSpeed();
+    var viewH = window.innerHeight;
+    var maxY = wrapper.scrollHeight - viewH;
+    var curY = window.scrollY;
+    var nextY = Math.min(curY + speed, maxY);
+    window.scrollTo(0, nextY);
+    if (nextY >= maxY) {
+      playing = false;
+      btn.classList.remove('playing');
+      btn.textContent = '▶';
+      return;
+    }
+    timer = requestAnimationFrame(step);
+  }
+
+  btn.addEventListener('click', function(){
+    playing = !playing;
+    if (playing) {
+      btn.classList.add('playing');
+      btn.textContent = '⏸';
+      step();
+    } else {
+      btn.classList.remove('playing');
+      btn.textContent = '▶';
+      if (timer) cancelAnimationFrame(timer);
+    }
+  });
 })();
 </script>
 </body>

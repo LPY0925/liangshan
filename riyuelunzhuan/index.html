@@ -5,7 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebGL Scroll Sync V2</title>
     <link rel="stylesheet" href="./style.css?v=card-chart-align-20260624">
-  </head>
+  <style>
+    .auto-scroll-btn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 9999;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 22px;
+      line-height: 48px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      transition: background 0.25s, transform 0.2s;
+      user-select: none;
+    }
+    .auto-scroll-btn:hover { background: rgba(0,0,0,0.75); transform: scale(1.08); }
+    .auto-scroll-btn:active { transform: scale(0.94); }
+    .auto-scroll-btn.is-playing::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.5);
+      animation: auto-scroll-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes auto-scroll-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%      { transform: scale(1.12); opacity: 0; }
+    }
+  </style>
+</head>
 
   <body>
     <canvas id="webgl-canvas"></canvas>
@@ -159,6 +196,60 @@
       <section></section>
     </div>
 
-    <script src="./script.js?v=card-first-visible-20260624"></script>
+    <button class="auto-scroll-btn" id="autoScrollBtn" type="button" title="自动滚动播放" aria-label="自动滚动播放">▶</button>
+
+    <script>
+      (function(){
+        const btn = document.getElementById('autoScrollBtn');
+        if (!btn) return;
+
+        let isPlaying = false;
+        let rafId = null;
+        const STEP = 0.6;         // px per frame
+        const INTERVAL = 16;      // ms (~60fps)
+
+        function scrollStep() {
+          const maxY = document.documentElement.scrollHeight - window.innerHeight;
+          if (maxY <= 0) { stop(); return; }
+
+          const next = window.scrollY + STEP;
+          if (next >= maxY) {
+            window.scrollTo({ top: maxY, behavior: 'instant' });
+            stop();
+            return;
+          }
+          window.scrollBy(0, STEP);
+          rafId = requestAnimationFrame(scrollStep);
+        }
+
+        function start() {
+          isPlaying = true;
+          btn.classList.add('is-playing');
+          btn.textContent = '⏸';
+          btn.title = '暂停自动滚动';
+          btn.setAttribute('aria-label', '暂停自动滚动');
+          rafId = requestAnimationFrame(scrollStep);
+        }
+
+        function stop() {
+          isPlaying = false;
+          btn.classList.remove('is-playing');
+          btn.textContent = '▶';
+          btn.title = '自动滚动播放';
+          btn.setAttribute('aria-label', '自动滚动播放');
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          isPlaying ? stop() : start();
+        });
+
+        // Stop on manual scroll
+        window.addEventListener('scroll', function() {
+          if (isPlaying) stop();
+        }, { passive: true });
+      })();
+    </script>
   </body>
 </html>

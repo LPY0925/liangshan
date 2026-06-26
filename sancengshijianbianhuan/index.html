@@ -269,6 +269,68 @@
   animation: music-spin 4s linear infinite;
 }
 
+/* ── 自动滚动按钮 ── */
+.auto-scroll-btn {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  z-index: 100000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.auto-scroll-btn:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.auto-scroll-btn.is-scrolling {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+}
+
+.auto-scroll-btn .scroll-icon-play,
+.auto-scroll-btn .scroll-icon-pause {
+  display: none;
+  pointer-events: none;
+}
+
+.auto-scroll-btn .scroll-icon-play { display: flex; }
+.auto-scroll-btn.is-scrolling .scroll-icon-play { display: none; }
+.auto-scroll-btn.is-scrolling .scroll-icon-pause { display: flex; }
+
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.75; transform: scale(1.06); }
+}
+.auto-scroll-btn.is-scrolling .scroll-icon-pause {
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+
     </style>
 
   </head>
@@ -329,6 +391,18 @@
         <path d="M9 18V5l12-2v13"/>
         <circle cx="6" cy="18" r="3"/>
         <circle cx="18" cy="16" r="3"/>
+      </svg>
+    </button>
+
+    <!-- 自动滚动 -->
+    <button class="auto-scroll-btn" id="autoScrollBtn" type="button" aria-label="自动滚动" title="自动滚动">
+      <svg class="scroll-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14"/>
+        <path d="M5 12h14"/>
+      </svg>
+      <svg class="scroll-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="4" width="4" height="16"/>
+        <rect x="14" y="4" width="4" height="16"/>
       </svg>
     </button>
 </div>
@@ -852,6 +926,48 @@
   audio.addEventListener('play', syncBtn);
   audio.addEventListener('pause', syncBtn);
 })();
+    </script>
+
+    <!-- 自动滚动 -->
+    <script>
+    (function(){
+      var btn = document.getElementById('autoScrollBtn');
+      if (!btn) return;
+      var speed = 0.5;           // px per tick
+      var interval = 30;         // ms per tick
+      var timer = null;
+      var isScrolling = false;
+
+      function startScroll() {
+        if (timer) return;
+        timer = setInterval(function(){
+          window.scrollBy(0, speed);
+        }, interval);
+        isScrolling = true;
+        btn.classList.add('is-scrolling');
+        btn.setAttribute('aria-label', '暂停自动滚动');
+      }
+
+      function stopScroll() {
+        if (timer) { clearInterval(timer); timer = null; }
+        isScrolling = false;
+        btn.classList.remove('is-scrolling');
+        btn.setAttribute('aria-label', '自动滚动');
+      }
+
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isScrolling ? stopScroll() : startScroll();
+      });
+
+      ['wheel','touchstart','touchmove','keydown'].forEach(function(ev) {
+        document.addEventListener(ev, function(e) {
+          if (!isScrolling) return;
+          if (e.type === 'keydown' && !['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(e.key)) return;
+          stopScroll();
+        }, { passive: true });
+      });
+    })();
     </script>
 
   </body>
