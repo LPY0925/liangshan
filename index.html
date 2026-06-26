@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>两山 20 年 — CDN 加速版</title>
+  <title>两山 20 年 — 从余村的一本账，到中国的 1006 个绿色坐标</title>
+  <meta http-equiv="refresh" content="0; url=shouye/dist/index.html">
+  <link rel="canonical" href="shouye/dist/index.html">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -23,135 +25,19 @@
       animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #page-content { min-height: 100vh; }
-    .cdn-error {
-      text-align: center; padding: 60px 20px;
-    }
-    .cdn-error a { color: #5d7649; }
+    a { color: #5d7649; }
   </style>
 </head>
 <body>
-  <div id="page-content">
-    <div class="loading" id="loading">
-      <h1>🌿 两山 20 年</h1>
-      <div class="spinner"></div>
-      <p>正在通过 CDN 加载...</p>
-      <p><small>国内节点加速中</small></p>
-    </div>
+  <div class="loading">
+    <h1>🌿 两山 20 年</h1>
+    <div class="spinner"></div>
+    <p>正在加载...</p>
+    <p style="margin-top:12px;"><a href="shouye/dist/index.html">如果未自动跳转，请点击此处</a></p>
   </div>
-
   <script>
-    (function() {
-      'use strict';
-
-      const CDN_BASE = 'https://cdn.jsdelivr.net/gh/LPY0925/liangshan@main';
-      const ENTRY_REL = '/shouye/dist/index.html';
-
-      // ── Cache loaded pages ──
-      const pageCache = {};
-
-      // ── Fetch HTML from CDN, inject <base> for CDN URLs ──
-      async function loadPage(cdnPath) {
-        const url = CDN_BASE + cdnPath;
-        if (pageCache[url]) return pageCache[url];
-
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        let html = await resp.text();
-
-        // Inject <base> tag so all relative URLs resolve against CDN
-        const dir = cdnPath.substring(0, cdnPath.lastIndexOf('/') + 1);
-        html = html.replace(
-          '</head>',
-          '<base href="' + CDN_BASE + dir + '">\n</head>'
-        );
-
-        pageCache[url] = html;
-        return html;
-      }
-
-      // ── Render fetched HTML into the page ──
-      function render(html) {
-        const container = document.getElementById('page-content');
-        container.innerHTML = html;
-
-        // Re-execute any scripts that were injected (they don't auto-run)
-        container.querySelectorAll('script').forEach(oldScript => {
-          const newScript = document.createElement('script');
-          for (const attr of oldScript.attributes) {
-            newScript.setAttribute(attr.name, attr.value);
-          }
-          newScript.textContent = oldScript.textContent;
-          oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
-      }
-
-      // ── Navigate to a CDN page ──
-      async function navigateTo(cdnPath) {
-        try {
-          const html = await loadPage(cdnPath);
-          render(html);
-          window.scrollTo(0, 0);
-        } catch (err) {
-          console.error('CDN nav error:', err);
-          document.getElementById('page-content').innerHTML =
-            '<div class="cdn-error"><h2>🌿 加载失败</h2><p>' +
-            err.message +
-            '</p><p><a href="javascript:location.reload()">重试</a> · ' +
-            '<a href="https://lpy0925.github.io/liangshan/">原始版</a></p></div>';
-        }
-      }
-
-      // ── Convert a relative URL to CDN path ──
-      function toCdnPath(href) {
-        // Parse the href relative to the current page's CDN base
-        // We need to know the current CDN path
-        // Extract from the current page URL or base
-        const base = document.querySelector('base')?.getAttribute('href') || CDN_BASE + '/';
-        const resolved = new URL(href, base);
-        // Convert to a CDN path (remove CDN_BASE prefix)
-        const path = resolved.pathname;
-        // Re-add CDN_BASE just the path part
-        return path;
-      }
-
-      // ── Intercept link clicks for SPA-like navigation ──
-      document.addEventListener('click', function(e) {
-        const link = e.target.closest('a');
-        if (!link) return;
-        const href = link.getAttribute('href');
-        if (!href) return;
-        // Skip external links, anchors, and special protocols
-        if (href.startsWith('http') || href.startsWith('//') ||
-            href.startsWith('#') || href.startsWith('mailto:') ||
-            href.startsWith('javascript:')) return;
-
-        e.preventDefault();
-
-        // Convert relative URL to CDN absolute path
-        const currentBase = document.querySelector('base')?.getAttribute('href') || CDN_BASE + '/shouye/dist/';
-        const resolvedUrl = new URL(href, currentBase);
-        const cdnPath = resolvedUrl.pathname;
-
-        navigateTo(cdnPath);
-        history.pushState({ cdnPath }, '', '?p=' + encodeURIComponent(cdnPath));
-      });
-
-      // ── Handle browser back/forward ──
-      window.addEventListener('popstate', function(e) {
-        const params = new URLSearchParams(location.search);
-        const savedPath = e.state?.cdnPath || params.get('p') || ENTRY_REL;
-        navigateTo(savedPath);
-      });
-
-      // ── Initial load ──
-      const params = new URLSearchParams(location.search);
-      const initialPath = params.get('p') || ENTRY_REL;
-      navigateTo(initialPath);
-      if (!params.get('p')) {
-        history.replaceState({ cdnPath: initialPath }, '', '?p=' + encodeURIComponent(initialPath));
-      }
-    })();
+    // 静态重定向到主入口页面
+    window.location.replace('shouye/dist/index.html');
   </script>
 </body>
 </html>
