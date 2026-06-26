@@ -260,8 +260,9 @@ async function initRegionMapBackground() {
     });
 
     try {
-        const response = await fetch('./data/china.json');
-        const geoJson = await response.json();
+        const geoJson = typeof CHINA_GEOJSON !== 'undefined'
+            ? CHINA_GEOJSON
+            : await (await fetch('./data/china.json')).json();
         echarts.registerMap('china', geoJson);
         regionMapChart.hideLoading();
 

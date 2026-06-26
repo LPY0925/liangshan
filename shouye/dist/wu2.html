@@ -815,6 +815,72 @@
           transition: none;
         }
       }
+
+/* ── 自动滚屏控件 ── */
+.auto-scroll-btn {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  z-index: 100000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(179, 149, 88, 0.38);
+  background: linear-gradient(145deg, rgba(248, 243, 234, 0.96), rgba(235, 225, 210, 0.94));
+  box-shadow:
+    0 3px 16px rgba(31, 42, 32, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5d7649;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.auto-scroll-btn:hover {
+  border-color: rgba(179, 149, 88, 0.6);
+  box-shadow:
+    0 6px 24px rgba(31, 42, 32, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: scale(1.04);
+}
+
+.auto-scroll-btn.is-active {
+  background: rgba(93, 118, 73, 0.9);
+  color: #f8f3ea;
+  border-color: rgba(93, 118, 73, 0.7);
+}
+
+.auto-scroll-btn .scroll-icon-play,
+.auto-scroll-btn .scroll-icon-pause {
+  display: none;
+  pointer-events: none;
+}
+
+.auto-scroll-btn .scroll-icon-play { display: flex; }
+.auto-scroll-btn.is-active .scroll-icon-play { display: none; }
+.auto-scroll-btn.is-active .scroll-icon-pause { display: flex; }
+
+@keyframes scroll-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.auto-scroll-btn.is-active {
+  animation: scroll-breathe 2s ease-in-out infinite;
+}
+
+@media (max-width: 480px) {
+  .auto-scroll-btn { top: 64px; right: 12px; }
+}
     </style>
 
   </head>
@@ -875,6 +941,15 @@
         <path d="M9 18V5l12-2v13"/>
         <circle cx="6" cy="18" r="3"/>
         <circle cx="18" cy="16" r="3"/>
+      </svg>
+    </button>
+    <button class="auto-scroll-btn" id="autoScrollBtn" type="button" aria-label="自动滚屏" title="自动滚屏">
+      <svg class="scroll-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      <svg class="scroll-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="4" width="4" height="16"/>
+        <rect x="14" y="4" width="4" height="16"/>
       </svg>
     </button>
 </div>
@@ -1522,6 +1597,56 @@
   audio.addEventListener('pause', syncBtn);
 })();
     </script>
+
+<script>
+(function () {
+  var btn = document.getElementById('autoScrollBtn');
+  if (!btn) return;
+
+  var interval = null;
+  var SPEED = 40; // pixels per tick
+
+  function syncBtn() {
+    if (interval) {
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-label', '暂停自动滚屏');
+    } else {
+      btn.classList.remove('is-active');
+      btn.setAttribute('aria-label', '自动滚屏');
+    }
+  }
+
+  function startScroll() {
+    if (interval) return;
+    interval = setInterval(function () {
+      var y = window.scrollY;
+      var maxY = document.documentElement.scrollHeight - window.innerHeight;
+      if (y >= maxY - 2) { stopScroll(); return; }
+      window.scrollBy(0, SPEED);
+    }, 200);
+    syncBtn();
+  }
+
+  function stopScroll() {
+    if (!interval) return;
+    clearInterval(interval);
+    interval = null;
+    syncBtn();
+  }
+
+  btn.addEventListener('click', function () {
+    if (interval) stopScroll(); else startScroll();
+  });
+
+  ['wheel','touchstart','touchmove','keydown'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (!interval) return;
+      if (e.type === 'keydown' && !['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(e.key)) return;
+      stopScroll();
+    }, { passive: true });
+  });
+})();
+</script>
 
   </body>
 </html>
