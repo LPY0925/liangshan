@@ -26,6 +26,7 @@ const chartStoryCollection = chartAnchor?.querySelector(".chart-story-collection
 const chartHotspots = scrollGraph
   ? Array.from(scrollGraph.querySelectorAll(".hotspot"))
   : [];
+const scrollLinkCue = document.querySelector(".scroll-link-cue");
 
 if (!ctx) {
   canvas.style.background = "#06080f";
@@ -65,6 +66,7 @@ const CLOUD_X_OFFSET = -0.12;
 const SUN_RADIUS_SCALE = 0.055;
 const FINAL_STORY_HOLD_LOCAL = 0.88;
 const STORY_CARD_MOBILE_BREAKPOINT = 980;
+const GRAPH_REVEAL_STEP = 1.6;
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -208,6 +210,16 @@ const updateChartExpandAvailability = (scrollProgress) => {
   }
 
   updateChartFlipAvailability();
+  updateScrollLinkCue(scrollProgress);
+};
+
+const updateScrollLinkCue = (scrollProgress) => {
+  if (!scrollLinkCue) return;
+
+  const visible = !chartExpanded && clamp01(scrollProgress) >= CHART_EXPAND_PROGRESS;
+
+  scrollLinkCue.classList.toggle("is-visible", visible);
+  scrollLinkCue.setAttribute("aria-hidden", visible ? "false" : "true");
 };
 
 const applyChartFullscreenState = (expanded) => {
@@ -452,14 +464,35 @@ const setupChartHotspots = () => {
   });
 };
 
+const getGraphRevealedPath = (measurePath, endLength) => {
+  const focus = measurePath.getPointAtLength(endLength);
+  const segmentLength = Math.max(0, endLength);
+
+  if (segmentLength <= 0.01) {
+    return `M${focus.x.toFixed(3)} ${focus.y.toFixed(3)}`;
+  }
+
+  const steps = Math.max(2, Math.ceil(segmentLength / GRAPH_REVEAL_STEP));
+  const points = [];
+
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps;
+    const point = measurePath.getPointAtLength(lerp(0, endLength, t));
+    points.push(`${i === 0 ? "M" : "L"}${point.x.toFixed(3)} ${point.y.toFixed(3)}`);
+  }
+
+  return points.join("");
+};
+
 const setupScrollGraph = () => {
   if (!scrollGraph || !graphPath || !graphFocalPoint || !graphPovScale || !graphPovPan) {
     return;
   }
 
-  graphPathLength = graphPath.getTotalLength();
-  graphPath.style.strokeDasharray = graphPathLength;
-  graphPath.style.strokeDashoffset = graphPathLength;
+  const graphMeasurePath = graphCompleteLine || graphPath;
+  graphPathLength = graphMeasurePath.getTotalLength();
+  graphPath.style.strokeDasharray = "none";
+  graphPath.style.strokeDashoffset = "0";
 
   updateScrollGraph(0);
 };
@@ -550,13 +583,15 @@ const updateScrollGraph = (scrollProgress) => {
   }
 
   const p = clamp01(scrollProgress);
-  const focus = graphPath.getPointAtLength(graphPathLength * p);
+  const graphMeasurePath = graphCompleteLine || graphPath;
+  const focusLength = graphPathLength * p;
+  const focus = graphMeasurePath.getPointAtLength(focusLength);
   const scaleT = smootherstep(p);
 
   scrollGraph.style.opacity = "1";
-  graphPath.style.strokeDashoffset = ((1 - p) * graphPathLength).toFixed(3);
+  graphPath.setAttribute("d", getGraphRevealedPath(graphMeasurePath, focusLength));
   if (graphCompleteLine) {
-    graphCompleteLine.style.opacity = clamp01((p - 0.94) / 0.06).toFixed(3);
+    graphCompleteLine.style.opacity = "0";
   }
   graphFocalPoint.setAttribute("cx", focus.x.toFixed(3));
   graphFocalPoint.setAttribute("cy", focus.y.toFixed(3));
