@@ -754,60 +754,6 @@
     </script>
   
     <script>
-/* 背景音乐 — 首次交互自动播放 */
-(function () {
-  var audio = document.getElementById('bgMusic');
-  var btn = document.getElementById('bgMusicBtn');
-  if (!audio || !btn) return;
-
-  audio.volume = 0.35;
-
-  function syncBtn() {
-    if (audio.paused) {
-      btn.classList.remove('is-playing');
-      btn.setAttribute('aria-label', '播放背景音乐');
-    } else {
-      btn.classList.add('is-playing');
-      btn.setAttribute('aria-label', '暂停背景音乐');
-    }
-  }
-
-  function tryAutoplay() {
-    if (!audio.paused) return;
-    audio.play().then(function () {
-      syncBtn();
-    }).catch(function () {});
-  }
-
-  // 首次任意用户交互时自动播放
-  var EVENTS = ['click', 'touchstart', 'keydown', 'scroll'];
-  function onFirstInteraction() {
-    EVENTS.forEach(function (ev) {
-      document.removeEventListener(ev, onFirstInteraction, { capture: true });
-    });
-    tryAutoplay();
-  }
-  EVENTS.forEach(function (ev) {
-    document.addEventListener(ev, onFirstInteraction, { once: true, capture: true, passive: true });
-  });
-
-  // 手动按钮控制
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation(); // 避免触发上面的首次交互逻辑
-    if (audio.paused) {
-      audio.play().then(syncBtn).catch(function () {});
-    } else {
-      audio.pause();
-      syncBtn();
-    }
-  });
-
-  audio.addEventListener('play', syncBtn);
-  audio.addEventListener('pause', syncBtn);
-})();
-    </script>
-
-    <script>
 /* 自动滚动 — 一键滚到底，轻触即停 */
 (function () {
   var btn = document.getElementById('autoScrollBtn');

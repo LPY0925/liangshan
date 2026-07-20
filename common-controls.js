@@ -10,6 +10,62 @@
   var stopAutoScroll = null;
   var userPausedMusic = false;
 
+  // ── 跨页面音乐连续播放：通过 sessionStorage 保存/恢复播放位置 ──
+  var SESSION_KEY_TIME = "liangshan_music_ct";
+  var SESSION_KEY_PLAYING = "liangshan_music_pl";
+  var SESSION_KEY_USER_PAUSE = "liangshan_music_up";
+  var SESSION_KEY_TS = "liangshan_music_ts";
+  var _musicSaveTimer = null;
+
+  function saveMusicState(audio) {
+    if (!audio || audio.readyState === 0) return;
+    try {
+      sessionStorage.setItem(SESSION_KEY_TIME, audio.currentTime);
+      sessionStorage.setItem(SESSION_KEY_PLAYING, (!audio.paused && !audio.ended) ? "1" : "0");
+      sessionStorage.setItem(SESSION_KEY_USER_PAUSE, userPausedMusic ? "1" : "0");
+      sessionStorage.setItem(SESSION_KEY_TS, Date.now());
+    } catch (e) { /* quota / cross-origin */ }
+  }
+
+  function restoreMusicState(audio) {
+    function doRestore() {
+      try {
+        var savedTime = parseFloat(sessionStorage.getItem(SESSION_KEY_TIME));
+        var wasPlaying = sessionStorage.getItem(SESSION_KEY_PLAYING) === "1";
+        var pausedByUser = sessionStorage.getItem(SESSION_KEY_USER_PAUSE) === "1";
+        var savedTs = parseInt(sessionStorage.getItem(SESSION_KEY_TS), 10);
+        if (!isNaN(savedTime) && savedTime > 0 && isFinite(audio.duration) && savedTime < audio.duration - 0.05) {
+          var elapsed = 0;
+          if (wasPlaying && !isNaN(savedTs)) {
+            elapsed = Math.max(0, (Date.now() - savedTs) / 1000);
+          }
+          var target = Math.min(savedTime + elapsed, audio.duration - 0.1);
+          // fastSeek 在支持的浏览器上更快，降级到设置 currentTime
+          if (audio.fastSeek) { audio.fastSeek(target); } else { audio.currentTime = target; }
+        }
+        if (pausedByUser) { userPausedMusic = true; }
+      } catch (e) { /* ignore */ }
+    }
+
+    if (audio.readyState >= 1) {
+      doRestore();
+    } else {
+      audio.addEventListener("loadedmetadata", function onMeta() {
+        audio.removeEventListener("loadedmetadata", onMeta);
+        doRestore();
+      }, { once: true });
+    }
+  }
+
+  function startSavingMusicState(audio) {
+    if (_musicSaveTimer) clearInterval(_musicSaveTimer);
+    _musicSaveTimer = setInterval(function () { saveMusicState(audio); }, 300);
+  }
+
+  function stopSavingMusicState() {
+    if (_musicSaveTimer) { clearInterval(_musicSaveTimer); _musicSaveTimer = null; }
+  }
+
   var labels = {
     musicPlay: "\u64ad\u653e\u80cc\u666f\u97f3\u4e50",
     musicPause: "\u6682\u505c\u80cc\u666f\u97f3\u4e50",
@@ -112,7 +168,8 @@
       document.body.appendChild(audio);
     }
 
-    if (!audio.getAttribute("src") && !audio.querySelector("source")) {
+    // 如果页面 HTML 只有 <source> 没有 src 属性，补上 src（统一指向同一个 mp3）
+    if (!audio.src) {
       audio.src = musicUrl;
     }
 
@@ -123,11 +180,21 @@
     audio.setAttribute("playsinline", "");
     audio.volume = 0.35;
     audio.muted = false;
+
+    // 强制触发加载：HTML 中 preload="none" 会让浏览器跳过预加载，仅改属性不够
+    if (audio.readyState === 0) {
+      audio.load();
+    }
     return audio;
   }
 
   function setupMusic() {
     var audio = ensureAudio();
+
+    // 🔑 从上一页面恢复播放位置（跨页面连续播放的核心）
+    restoreMusicState(audio);
+    startSavingMusicState(audio);
+
     var button = cleanButton("bgMusicBtn", "bg-music-btn");
     button.innerHTML = icon("musicPlay") + icon("musicPause");
     button.title = labels.musicTitle;
@@ -317,5 +384,12 @@
 
   window.addEventListener("beforeunload", function () {
     if (stopAutoScroll) stopAutoScroll();
+    // 保存当前播放位置，供下一页恢复
+    var audio = document.getElementById("bgMusic");
+    if (audio) {
+      // 最后一次保存：把定时器停掉避免竞争
+      stopSavingMusicState();
+      saveMusicState(audio);
+    }
   });
 })();

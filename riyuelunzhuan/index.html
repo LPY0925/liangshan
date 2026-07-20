@@ -222,11 +222,15 @@
 
           const next = window.scrollY + STEP;
           if (next >= maxY) {
+            isAutoScrolling = true;
             window.scrollTo({ top: maxY, behavior: 'instant' });
+            isAutoScrolling = false;
             stop();
             return;
           }
+          isAutoScrolling = true;
           window.scrollBy(0, STEP);
+          isAutoScrolling = false;
           rafId = requestAnimationFrame(scrollStep);
         }
 
@@ -253,8 +257,11 @@
           isPlaying ? stop() : start();
         });
 
-        // Stop on manual scroll
+        // Distinguish auto-scroll from manual scroll
+        let isAutoScrolling = false;
+
         window.addEventListener('scroll', function() {
+          if (isAutoScrolling) return; // ignore scroll events triggered by auto-scroll itself
           if (isPlaying) stop();
         }, { passive: true });
       })();
