@@ -478,36 +478,62 @@
         z-index: 9999;
         pointer-events: none;
         visibility: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        overflow: hidden;
       }
       .transition-overlay.is-visible {
         visibility: visible;
       }
       .transition-overlay__pane {
-        position: absolute;
+        position: relative;
         top: 0;
-        width: 50%;
-        height: 100%;
-        transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1);
+        width: auto;
+        min-width: 0;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        transform: translate3d(0, 0, 0);
+        transition: transform 860ms cubic-bezier(0.76, 0, 0.24, 1);
         will-change: transform;
+      }
+      .transition-overlay__pane::before,
+      .transition-overlay__pane::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .transition-overlay__pane::before {
+        opacity: 0.12;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.74'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+      .transition-overlay__pane::after {
+        background:
+          linear-gradient(to bottom, rgba(255, 250, 235, 0.22), transparent 30%, transparent 74%, rgba(104, 68, 32, 0.14)),
+          radial-gradient(ellipse at center, transparent 34%, rgba(126, 89, 48, 0.18) 100%);
       }
       .transition-overlay__pane--left {
         left: 0;
-        background: #dcefdc;
-        transform: translateY(100%);
+        background: linear-gradient(145deg, #d8ead1 0%, #b7d9aa 58%, #8fbf89 100%);
+        box-shadow: inset -1px 0 rgba(246, 255, 238, 0.26);
+        transform: translate3d(0, 104%, 0);
       }
       .transition-overlay__pane--right {
         right: 0;
-        background: #dceefa;
-        transform: translateY(-100%);
+        background: linear-gradient(215deg, #d7ebf4 0%, #aecfe2 54%, #85b3cf 100%);
+        box-shadow: inset 1px 0 rgba(240, 250, 255, 0.24);
+        transform: translate3d(0, -104%, 0);
       }
       .transition-overlay.is-visible .transition-overlay__pane {
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
       }
       .transition-overlay.is-revealing .transition-overlay__pane--left {
-        transform: translateY(-100%);
+        transform: translate3d(0, -104%, 0);
       }
       .transition-overlay.is-revealing .transition-overlay__pane--right {
-        transform: translateY(100%);
+        transform: translate3d(0, 104%, 0);
       }
       .scroll-boundary-link {
         position: fixed;
@@ -1995,88 +2021,10 @@
       }, { threshold: [0, 0.2, 0.5, 0.8] });
       io.observe(wrapper);
     })();
-    </script>    <script>
-(function () {
-  var sphere = document.querySelector('.catalog-sphere');
-  if (!sphere) return;
-  var toggle = sphere.querySelector('.cs-toggle');
-  var panel = sphere.querySelector('.cs-panel');
-  var backdrop = document.querySelector('.cs-backdrop');
-  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
-  var isOpen = false;
-
-  // 标记当前章节
-  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
-  items.forEach(function (item) {
-    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
-      item.classList.add('is-current');
-      item.setAttribute('aria-current', 'page');
-    }
-  });
-
-  function open() {
-    if (isOpen) return;
-    isOpen = true;
-    sphere.classList.add('is-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    panel.setAttribute('aria-hidden', 'false');
-  }
-
-  function close() {
-    if (!isOpen) return;
-    isOpen = false;
-    sphere.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    panel.setAttribute('aria-hidden', 'true');
-  }
-
-  toggle.addEventListener('click', function (e) {
-    e.stopPropagation();
-    isOpen ? close() : open();
-  });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', function () { close(); });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (isOpen && !sphere.contains(e.target)) {
-      close();
-    }
-  });
-
-  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
-  items.forEach(function (item) {
-    item.addEventListener('click', function (e) {
-      var href = item.getAttribute('href') || '';
-      if (href.indexOf('#') === 0) {
-        e.preventDefault();
-        close();
-        if (href.length > 1) {
-          setTimeout(function () {
-            var el = document.getElementById(href.substring(1));
-            if (el) {
-              var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
-              window.scrollTo({ top: top, behavior: 'smooth' });
-            }
-          }, 350);
-        }
-      } else {
-        close();
-      }
-    });
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) {
-      close();
-      toggle.focus();
-    }
-  });
-})();
     </script>
+    <!-- 目录球与遮罩：公共实现见 common-controls.js -->
+    <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
-  
 <!-- 自动滚动 -->
 <script>
 (function () {

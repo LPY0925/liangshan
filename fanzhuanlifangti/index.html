@@ -715,70 +715,15 @@
       <a href="#s0">两山理论宣传海报</a>
     </div>
 
+    <div class="transition-overlay" id="transitionOverlay" aria-hidden="true">
+      <span class="transition-overlay__pane transition-overlay__pane--left" aria-hidden="true"></span>
+      <span class="transition-overlay__pane transition-overlay__pane--right" aria-hidden="true"></span>
+    </div>
+
     <script src="./script.js?v=copy-v3"></script>
 
-    <script>
-/* 目录球交互 */
-(function () {
-  var sphere = document.querySelector('.catalog-sphere');
-  if (!sphere) return;
-  var toggle = sphere.querySelector('.cs-toggle');
-  var panel = sphere.querySelector('.cs-panel');
-  var backdrop = document.querySelector('.cs-backdrop');
-  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
-  var isOpen = false;
-
-  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
-  items.forEach(function (item) {
-    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
-      item.classList.add('is-current');
-      item.setAttribute('aria-current', 'page');
-    }
-  });
-
-  function open() {
-    if (isOpen) return;
-    isOpen = true;
-    sphere.classList.add('is-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    panel.setAttribute('aria-hidden', 'false');
-  }
-
-  function close() {
-    if (!isOpen) return;
-    isOpen = false;
-    sphere.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    panel.setAttribute('aria-hidden', 'true');
-  }
-
-  toggle.addEventListener('click', function (e) {
-    e.stopPropagation();
-    isOpen ? close() : open();
-  });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', function () { close(); });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (isOpen && !sphere.contains(e.target)) {
-      close();
-    }
-  });
-
-  items.forEach(function (item) {
-    item.addEventListener('click', function () { close(); });
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) {
-      close();
-      toggle.focus();
-    }
-  });
-})();
-    </script>
+    <!-- 目录球与遮罩：公共实现见 common-controls.js -->
+    <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
 <script>
 (function() {

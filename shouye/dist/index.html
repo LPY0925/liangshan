@@ -450,11 +450,12 @@
       <section class="sun-cycle-stage" id="sunCycleStage" aria-label="日月轮转">
         <canvas id="webgl-canvas"></canvas>
 
+        <div id="chapter-1" aria-hidden="true" style="position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;"></div>
         <div class="sun-intro-mask" id="sunIntroMask" aria-label="余村转折导语">
           <div class="sun-mask-cursor-glow" id="sunMaskCursorGlow" aria-hidden="true"></div>
           <div class="sun-mask-cursor-dot" id="sunMaskCursorDot" aria-hidden="true"></div>
           <div class="sun-intro-text">
-            <h2 class="sun-intro-title" id="chapter-1">壹 · 第一个坐标</h2>
+            <h2 class="sun-intro-title">壹 · 第一个坐标</h2>
             <p class="sun-intro-copy">
               2026年的余村，溪水清澈，竹海如画，游客络绎不绝。而把日历翻回2003年，画面却是另一番模样：矿山机器昼夜轰鸣，石灰粉尘遮天蔽日，村民们捂着口鼻进出。同一个村庄，两种截然不同的命运——而这一切的分野，就藏在二十多年前那个看似普通的决定里。
             </p>
@@ -639,64 +640,14 @@
     <script src="../../riyuelunzhuan/script.js?v=scroll-cue-20260627"></script>
 
     <script>
+/* 首页定制锚点滚动：含 hash 写入 + chapter-1 特殊对齐 + 开篇回顶 */
 (function () {
-  var sphere = document.querySelector('.catalog-sphere');
-  if (!sphere) return;
-  var toggle = sphere.querySelector('.cs-toggle');
-  var panel = sphere.querySelector('.cs-panel');
-  var backdrop = document.querySelector('.cs-backdrop');
-  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
-  var isOpen = false;
-
-  // 标记当前章节
-  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
-  items.forEach(function (item) {
-    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
-      item.classList.add('is-current');
-      item.setAttribute('aria-current', 'page');
-    }
-  });
-
-  function open() {
-    if (isOpen) return;
-    isOpen = true;
-    sphere.classList.add('is-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    panel.setAttribute('aria-hidden', 'false');
-  }
-
-  function close() {
-    if (!isOpen) return;
-    isOpen = false;
-    sphere.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    panel.setAttribute('aria-hidden', 'true');
-  }
-
-  toggle.addEventListener('click', function (e) {
-    e.stopPropagation();
-    isOpen ? close() : open();
-  });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', function () { close(); });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (isOpen && !sphere.contains(e.target)) {
-      close();
-    }
-  });
-
   function updateHash(hash) {
     if (!window.history || !window.history.pushState) return;
-
     try {
       var nextUrl = hash || (window.location.pathname + window.location.search);
       window.history.pushState(null, '', nextUrl);
-    } catch (err) {
-      // 某些本地 file:// 环境可能限制 history，滚动仍然照常执行。
-    }
+    } catch (err) { /* file:// 环境安全降级 */ }
   }
 
   function scrollToOpening() {
@@ -704,55 +655,35 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function scrollToAnchor(href) {
+  function scrollToAnchorCustom(href) {
     if (href === '#') {
       scrollToOpening();
-      return;
+      return true;
     }
-
     var id = href.substring(1);
-
     if (id === 'chapter-1' && typeof window.scrollToHomeChapterOne === 'function') {
       updateHash(href);
       window.scrollToHomeChapterOne({ behavior: 'smooth' });
-      return;
+      return true;
     }
-
     var el = document.getElementById(id);
     if (el) {
       updateHash(href);
       var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
       window.scrollTo({ top: top, behavior: 'smooth' });
+      return true;
     }
+    return false;
   }
 
-  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
-  items.forEach(function (item) {
-    item.addEventListener('click', function (e) {
-      var href = item.getAttribute('href') || '';
-      if (href.indexOf('#') === 0) {
-        // 同页锚点：阻止默认行为，手动滚动
-        e.preventDefault();
-        close();
-        setTimeout(function () {
-          scrollToAnchor(href);
-        }, 350);
-      } else {
-        // 跨页跳转：先关面板，浏览器处理 <a> 导航
-        close();
-      }
-    });
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) {
-      close();
-      toggle.focus();
-    }
-  });
+  // 暴露给公共目录球代码优先使用
+  window.scrollToAnchorCustom = scrollToAnchorCustom;
 })();
     </script>
-  
+
+    <!-- 目录球与遮罩：公共实现见 common-controls.js -->
+    <!-- ponytail: 内联目录球重复切换/点击代码已删除，由 common-controls.js 统一接管 -->
+
     <script>
 /* 自动滚动 — 一键滚到底，轻触即停 */
 (function () {

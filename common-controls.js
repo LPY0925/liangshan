@@ -117,7 +117,31 @@
       "@keyframes liangshan-music-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}",
       "@keyframes liangshan-control-pulse{0%,100%{box-shadow:0 3px 16px rgba(31,42,32,.14),0 0 0 1px rgba(255,255,255,.24) inset}50%{box-shadow:0 3px 22px rgba(93,118,73,.30),0 0 0 1px rgba(255,255,255,.30) inset}}",
       "@media (max-width:480px){.bg-music-btn[data-liangshan-control],.auto-scroll-btn[data-liangshan-control]{right:12px!important;width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important}.bg-music-btn[data-liangshan-control]{top:14px!important}.auto-scroll-btn[data-liangshan-control]{top:64px!important}}",
-      "@media (prefers-reduced-motion:reduce){.bg-music-btn[data-liangshan-control],.auto-scroll-btn[data-liangshan-control]{transition:none!important}.bg-music-btn[data-liangshan-control].is-playing .control-icon-pause,.auto-scroll-btn[data-liangshan-control].is-scrolling{animation:none!important}}"
+      "@media (prefers-reduced-motion:reduce){.bg-music-btn[data-liangshan-control],.auto-scroll-btn[data-liangshan-control]{transition:none!important}.bg-music-btn[data-liangshan-control].is-playing .control-icon-pause,.auto-scroll-btn[data-liangshan-control].is-scrolling{animation:none!important}}",
+      /* 公共遮罩样式：transitionOverlay / chapterTransitionMask / returnTransitionMask 统一 */
+      "#transitionOverlay.is-visible,#chapterTransitionMask.is-active,#returnTransitionMask.is-active{visibility:visible!important}",
+      "#transitionOverlay,#chapterTransitionMask,#returnTransitionMask{display:grid!important;grid-template-columns:1fr 1fr!important;inset:0!important;overflow:hidden!important;pointer-events:none!important;position:fixed!important;visibility:hidden!important;z-index:9999!important}",
+      "#transitionOverlay>span,#transitionOverlay>div,#chapterTransitionMask>div,#returnTransitionMask>div{display:block!important;block-size:100vh!important;block-size:100dvh!important;min-inline-size:0!important;overflow:hidden!important;position:relative!important;transform:translate3d(0,0,0)!important;transition:transform 860ms cubic-bezier(0.76,0,0.24,1)!important;will-change:transform!important}",
+      "#transitionOverlay>span::before,#transitionOverlay>span::after,#chapterTransitionMask>div::before,#chapterTransitionMask>div::after,#returnTransitionMask>div::before,#returnTransitionMask>div::after{content:\"\"!important;inset:0!important;pointer-events:none!important;position:absolute!important}",
+      "#transitionOverlay>span::before,#chapterTransitionMask>div::before,#returnTransitionMask>div::before{background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.86' numOctaves='3' stitchTiles='stitch' type='fractalNoise'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.74'/%3E%3C/svg%3E\")!important;mix-blend-mode:soft-light!important;opacity:0.12!important}",
+      "#transitionOverlay>span::after,#chapterTransitionMask>div::after,#returnTransitionMask>div::after{background:linear-gradient(to bottom,rgba(255,250,235,0.22),transparent 30%,transparent 74%,rgba(104,68,32,0.14)),radial-gradient(ellipse at center,transparent 34%,rgba(126,89,48,0.18) 100%)!important}",
+      /* 左面板：绿，从底部上来 */
+      "#transitionOverlay .transition-overlay__pane--left,#chapterTransitionMask .chapter-transition-panel--left,#returnTransitionMask .return-transition-panel--left{background:linear-gradient(145deg,#d8ead1 0%,#b7d9aa 58%,#8fbf89 100%)!important;box-shadow:inset -1px 0 rgba(246,255,238,0.26)!important;transform:translate3d(0,104%,0)!important}",
+      /* 右面板：蓝，从顶部下来 */
+      "#transitionOverlay .transition-overlay__pane--right,#chapterTransitionMask .chapter-transition-panel--right,#returnTransitionMask .return-transition-panel--right{background:linear-gradient(215deg,#d7ebf4 0%,#aecfe2 54%,#85b3cf 100%)!important;box-shadow:inset 1px 0 rgba(240,250,255,0.24)!important;transform:translate3d(0,-104%,0)!important}",
+      "#transitionOverlay.is-visible .transition-overlay__pane--left,#chapterTransitionMask.is-active .chapter-transition-panel--left,#returnTransitionMask.is-active .return-transition-panel--left,",
+      "#transitionOverlay.is-visible .transition-overlay__pane--right,#chapterTransitionMask.is-active .chapter-transition-panel--right,#returnTransitionMask.is-active .return-transition-panel--right{transform:translate3d(0,0,0)!important}",
+      "#transitionOverlay.is-revealing .transition-overlay__pane--left,#chapterTransitionMask.is-revealing .chapter-transition-panel--left,#returnTransitionMask.is-revealing .return-transition-panel--left{transform:translate3d(0,-104%,0)!important}",
+      "#transitionOverlay.is-revealing .transition-overlay__pane--right,#chapterTransitionMask.is-revealing .chapter-transition-panel--right,#returnTransitionMask.is-revealing .return-transition-panel--right{transform:translate3d(0,104%,0)!important}",
+      /* 边界跳转链接（scroll-boundary-link / .scroll-boundary-link--next / previous） */
+      ".scroll-boundary-link{position:fixed!important;left:50%!important;z-index:120!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;color:rgba(77,93,72,0.62)!important;font-family:\"Noto Serif SC\",\"Source Han Serif SC\",\"思源宋体\",serif!important;font-size:14px!important;letter-spacing:4px!important;text-decoration:none!important;opacity:0!important;pointer-events:none!important;transform:translate(-50%,14px)!important;transition:opacity 0.36s ease,transform 0.36s ease!important}",
+      ".scroll-boundary-link.is-visible{opacity:1!important;pointer-events:auto!important;transform:translate(-50%,0)!important}",
+      ".scroll-boundary-link--next,.scroll-boundary-link--next{bottom:22px!important}",
+      ".scroll-boundary-link--previous,.scroll-boundary-link--prev{top:22px!important;transform:translate(-50%,-14px)!important}",
+      ".scroll-boundary-link--previous.is-visible,.scroll-boundary-link--prev.is-visible{transform:translate(-50%,0)!important}",
+      ".scroll-boundary-link .edge-arrow{inline-size:1.125rem!important;block-size:1.125rem!important;border-inline-end:2px solid rgba(93,118,73,0.38)!important;border-block-end:2px solid rgba(93,118,73,0.38)!important;transform:rotate(45deg)!important}",
+      ".scroll-boundary-link--previous .edge-arrow,.scroll-boundary-link--prev .edge-arrow{transform:rotate(225deg)!important}",
+      "@media (prefers-reduced-motion:reduce){#transitionOverlay>span,#chapterTransitionMask>div,#returnTransitionMask>div,.scroll-boundary-link{transition-duration:180ms!important}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -382,12 +406,163 @@
     init();
   }
 
+  // ── 公共：页面切换遮罩触发 ──
+  var TRANSITION_IDS = ["transitionOverlay", "chapterTransitionMask", "returnTransitionMask"];
+  var _transitionNavigating = false;
+
+  function findTransitionMask() {
+    for (var i = 0; i < TRANSITION_IDS.length; i++) {
+      var el = document.getElementById(TRANSITION_IDS[i]);
+      if (el) return el;
+    }
+    return null;
+  }
+
+  function getActiveClass(mask) {
+    if (!mask) return "is-visible";
+    return mask.id === "transitionOverlay" ? "is-visible" : "is-active";
+  }
+
+  function triggerPageTransition(targetHref, extraDelay) {
+    if (_transitionNavigating || !targetHref) return;
+    var mask = findTransitionMask();
+    if (!mask) {
+      window.location.href = targetHref;
+      return;
+    }
+    _transitionNavigating = true;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var delay = (reduced ? 180 : 920) + (extraDelay || 0);
+    mask.classList.remove("is-revealing");
+    mask.classList.add(getActiveClass(mask));
+    window.setTimeout(function () {
+      window.location.href = targetHref;
+    }, delay);
+  }
+
+  function scrollToAnchor(hash) {
+    if (!hash) return;
+    // 优先使用页面自定义的滚动逻辑（含 hash="#" 即开篇回顶）
+    if (typeof window.__catalogScrollTo === "function" && window.__catalogScrollTo(hash.length > 1 ? hash.substring(1) : "")) return;
+    if (typeof scrollToAnchorCustom === "function" && scrollToAnchorCustom(hash)) return;
+    if (hash.length < 2) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    var el = document.getElementById(hash.substring(1));
+    if (!el) return;
+    var top = el.getBoundingClientRect().top + (window.pageYOffset || 0) - 60;
+    window.scrollTo({ top: top, behavior: "smooth" });
+  }
+
+  // ── 公共：目录球交互（消除每页 ~80 行重复） ──
+  function setupCatalogSphere() {
+    var sphere = document.querySelector(".catalog-sphere");
+    if (!sphere) return;
+    var toggle = sphere.querySelector(".cs-toggle");
+    var panel = sphere.querySelector(".cs-panel");
+    var backdrop = document.querySelector(".cs-backdrop");
+    var items = Array.prototype.slice.call(sphere.querySelectorAll(".cs-item"));
+    var isOpen = false;
+
+    var currentChapters = (sphere.getAttribute("data-current") || "").split(",").map(function (s) { return s.trim(); });
+    items.forEach(function (item) {
+      if (currentChapters.indexOf(item.getAttribute("data-chapter")) !== -1) {
+        item.classList.add("is-current");
+        item.setAttribute("aria-current", "page");
+      }
+    });
+
+    function open() {
+      if (isOpen) return;
+      isOpen = true;
+      sphere.classList.add("is-open");
+      if (toggle) toggle.setAttribute("aria-expanded", "true");
+      if (panel) panel.setAttribute("aria-hidden", "false");
+    }
+    function close() {
+      if (!isOpen) return;
+      isOpen = false;
+      sphere.classList.remove("is-open");
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+      if (panel) panel.setAttribute("aria-hidden", "true");
+    }
+
+    if (toggle) {
+      toggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        isOpen ? close() : open();
+      });
+    }
+    if (backdrop) {
+      backdrop.addEventListener("click", function () { close(); });
+    }
+    document.addEventListener("click", function (e) {
+      if (isOpen && sphere && !sphere.contains(e.target)) close();
+    });
+
+    items.forEach(function (item) {
+      item.addEventListener("click", function (e) {
+        var href = item.getAttribute("href") || "";
+        if (href.indexOf("#") === 0) {
+          e.preventDefault();
+          close();
+          window.setTimeout(function () { scrollToAnchor(href); }, 350);
+        } else {
+          e.preventDefault();
+          close();
+          window.setTimeout(function () { triggerPageTransition(href, 0); }, 320);
+        }
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen) {
+        close();
+        if (toggle) toggle.focus();
+      }
+    });
+  }
+
+  // ── 公共：通用内容超链接遮罩（带 data-page-transition 的 a 标签） ──
+  function setupTransitionLinks() {
+    document.addEventListener("click", function (e) {
+      var link = e.target.closest ? e.target.closest("a[data-page-transition], a.home-return, #first-batch-base-link") : null;
+      if (!link) return;
+      var href = link.getAttribute("href");
+      if (!href || href.indexOf("#") === 0) return;
+      e.preventDefault();
+      triggerPageTransition(href, 0);
+    });
+  }
+
+  // 暴露到 window，方便页面特殊逻辑复用
+  window.liangshanTransition = {
+    trigger: triggerPageTransition,
+    findMask: findTransitionMask,
+    scrollToAnchor: scrollToAnchor
+  };
+
+  function init() {
+    if (!document.body) return;
+    injectStyle();
+    setupMusic();
+    setupAutoScroll();
+    setupCatalogVisibility();
+    setupCatalogSphere();
+    setupTransitionLinks();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+
   window.addEventListener("beforeunload", function () {
     if (stopAutoScroll) stopAutoScroll();
-    // 保存当前播放位置，供下一页恢复
     var audio = document.getElementById("bgMusic");
     if (audio) {
-      // 最后一次保存：把定时器停掉避免竞争
       stopSavingMusicState();
       saveMusicState(audio);
     }

@@ -91,11 +91,19 @@ if (stage && container && beforeImage && sliderDivider && titleOverlay && scroll
     });
   }
 
+  window.__forceUpdateHomeScene = function () {
+    if (ticking) { ticking = false; }
+    updateScene();
+  };
+
   window.addEventListener("scroll", requestSceneUpdate, { passive: true });
   window.addEventListener("resize", requestSceneUpdate);
   window.addEventListener("load", updateScene);
 
   updateScene();
+  if (typeof window.__forceUpdateHomeScene === "function") {
+    window.__forceUpdateHomeScene();
+  }
 }
 
 const chapterTransitionMask = document.getElementById("chapterTransitionMask");
@@ -156,6 +164,12 @@ if (chapterTransitionMask && timeTransitionLink) {
     return Math.max(0, sunCycleStage.offsetTop);
   }
 
+  function forceRefreshHomeScene() {
+    if (typeof window.__forceUpdateHomeScene === "function") {
+      window.__forceUpdateHomeScene();
+    }
+  }
+
   window.scrollToHomeChapterOne = function (options = {}) {
     const targetTop = getChapterOneTop();
     if (targetTop === null) return false;
@@ -165,6 +179,9 @@ if (chapterTransitionMask && timeTransitionLink) {
       behavior: options.behavior || "auto"
     });
     resetBottomIntent();
+    forceRefreshHomeScene();
+    window.setTimeout(forceRefreshHomeScene, 0);
+    window.setTimeout(forceRefreshHomeScene, 20);
     return true;
   };
 
@@ -197,6 +214,9 @@ if (chapterTransitionMask && timeTransitionLink) {
     window.scrollTo({ top: targetScrollY, behavior: "auto" });
     resetBottomIntent();
     firstBatchPositioned = true;
+    forceRefreshHomeScene();
+    window.setTimeout(forceRefreshHomeScene, 0);
+    window.setTimeout(forceRefreshHomeScene, 20);
   }
 
   function positionBeforeChapterTransition() {
@@ -212,6 +232,9 @@ if (chapterTransitionMask && timeTransitionLink) {
     window.scrollTo({ top: targetTop, behavior: "auto" });
     resetBottomIntent();
     returnAnchorPositioned = true;
+    forceRefreshHomeScene();
+    window.setTimeout(forceRefreshHomeScene, 0);
+    window.setTimeout(forceRefreshHomeScene, 20);
   }
 
   function getTriggerZoneProgress() {
@@ -350,4 +373,7 @@ if (chapterTransitionMask && timeTransitionLink) {
     window.setTimeout(positionBeforeChapterTransition, 480);
     window.setTimeout(positionToFirstBatchLink, 480);
   });
+
+  // ponytail: first-batch-base-link click 处理统一移交 common-controls.js 的 setupTransitionLinks
+  // (document 级 click 委托，自动匹配 #first-batch-base-link, .home-return, [data-page-transition])
 }

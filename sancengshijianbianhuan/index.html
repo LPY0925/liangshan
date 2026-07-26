@@ -791,87 +791,8 @@
 
     <script src="./script.js?v=return-transition-20260623b"></script>
 
-    <script>
-(function () {
-  var sphere = document.querySelector('.catalog-sphere');
-  if (!sphere) return;
-  var toggle = sphere.querySelector('.cs-toggle');
-  var panel = sphere.querySelector('.cs-panel');
-  var backdrop = document.querySelector('.cs-backdrop');
-  var items = Array.prototype.slice.call(sphere.querySelectorAll('.cs-item'));
-  var isOpen = false;
-
-  var currentChapters = (sphere.getAttribute('data-current') || '').split(',').map(function (s) { return s.trim(); });
-  items.forEach(function (item) {
-    if (currentChapters.indexOf(item.getAttribute('data-chapter')) !== -1) {
-      item.classList.add('is-current');
-      item.setAttribute('aria-current', 'page');
-    }
-  });
-
-  function open() {
-    if (isOpen) return;
-    isOpen = true;
-    sphere.classList.add('is-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    panel.setAttribute('aria-hidden', 'false');
-  }
-
-  function close() {
-    if (!isOpen) return;
-    isOpen = false;
-    sphere.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    panel.setAttribute('aria-hidden', 'true');
-  }
-
-  toggle.addEventListener('click', function (e) {
-    e.stopPropagation();
-    isOpen ? close() : open();
-  });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', function () { close(); });
-  }
-
-  document.addEventListener('click', function (e) {
-    if (isOpen && !sphere.contains(e.target)) {
-      close();
-    }
-  });
-
-  // 统一点击逻辑：# 开头的同页锚点用 scrollTo 处理，其余交给浏览器
-  items.forEach(function (item) {
-    item.addEventListener('click', function (e) {
-      var href = item.getAttribute('href') || '';
-      if (href.indexOf('#') === 0) {
-        e.preventDefault();
-        close();
-        if (href.length > 1) {
-          var hash = href.substring(1);
-          setTimeout(function () {
-            if (window.__catalogScrollTo && window.__catalogScrollTo(hash)) return;
-            var el = document.getElementById(hash);
-            if (el) {
-              var top = el.getBoundingClientRect().top + window.pageYOffset - 60;
-              window.scrollTo({ top: top, behavior: 'smooth' });
-            }
-          }, 350);
-        }
-      } else {
-        close();
-      }
-    });
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && isOpen) {
-      close();
-      toggle.focus();
-    }
-  });
-})();
-    </script>
+    <!-- 目录球与遮罩：公共实现见 common-controls.js -->
+    <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
   
     <!-- 自动滚动 -->
