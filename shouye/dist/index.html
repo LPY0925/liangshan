@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>两山 20 年：从余村的一本账，到中国的 1006 个绿色坐标</title>
-    <link rel="stylesheet" href="../../riyuelunzhuan/style.css?v=scroll-cue-20260627">
+    <link rel="stylesheet" href="../../riyuelunzhuan/style.css?v=structure-speed-20260726">
     <link rel="stylesheet" href="./style.css?v=chapter-transition-20260623b">
     <style>
 /* ── 目录球 ── */
@@ -347,45 +347,7 @@
 
   <body>
     <!-- 目录球 -->
-    <nav class="catalog-sphere" aria-label="章节目录" data-current="开篇,壹">
-      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
-        <span class="cs-icon" aria-hidden="true">
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-        </span>
-      </button>
-      <div class="cs-panel" aria-hidden="true">
-        <a class="cs-item" href="#" data-chapter="开篇">
-          <img class="cs-thumb" src="../../images/nav/kaipian.png" alt="">
-          <span class="cs-label">开篇</span>
-        </a>
-        <a class="cs-item" href="#chapter-1" data-chapter="壹">
-          <img class="cs-thumb" src="../../images/nav/yi.png" alt="">
-          <span class="cs-label">壹 · 第一个坐标</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
-          <img class="cs-thumb" src="../../images/nav/er.png" alt="">
-          <span class="cs-label">贰 · 青山为凭</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
-          <img class="cs-thumb" src="../../images/nav/san.png" alt="">
-          <span class="cs-label">叁 · 碧空为证</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
-          <img class="cs-thumb" src="../../images/nav/si.png" alt="">
-          <span class="cs-label">肆 · 清流为鉴</span>
-        </a>
-        <a class="cs-item" href="wu.html" data-chapter="伍">
-          <img class="cs-thumb" src="../../images/nav/wu.png" alt="">
-          <span class="cs-label">伍 · 一棵树值多少钱？</span>
-        </a>
-        <a class="cs-item" href="../../chaojuanzhou/index.html" data-chapter="陆">
-          <img class="cs-thumb" src="../../images/nav/liu.png" alt="">
-          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
-        </a>
-      </div>
-    </nav>
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="开篇,壹"></nav>
     <div class="cs-backdrop" aria-hidden="true"></div>
 
 <!-- 背景音乐 -->
@@ -637,7 +599,7 @@
     </div>
 
     <script src="./script.js?v=chapter-anchor-fix-20260625"></script>
-    <script src="../../riyuelunzhuan/script.js?v=scroll-cue-20260627"></script>
+    <script src="../../riyuelunzhuan/script.js?v=restore-line-20260726"></script>
 
     <script>
 /* 首页定制锚点滚动：含 hash 写入 + chapter-1 特殊对齐 + 开篇回顶 */
@@ -684,94 +646,6 @@
     <!-- 目录球与遮罩：公共实现见 common-controls.js -->
     <!-- ponytail: 内联目录球重复切换/点击代码已删除，由 common-controls.js 统一接管 -->
 
-    <script>
-/* 自动滚动 — 一键滚到底，轻触即停 */
-(function () {
-  var btn = document.getElementById('autoScrollBtn');
-  if (!btn) return;
-
-  var SPEED = 3; // 每帧滚动像素（约 180 px/s @60fps → 约 1 屏/2s）
-  var rafId = null;
-  var running = false;
-
-  function stop() {
-    if (!running) return;
-    running = false;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    btn.classList.remove('is-playing');
-    btn.setAttribute('aria-label', '启动自动滚动');
-  }
-
-  function start() {
-    if (running) return;
-    running = true;
-    btn.classList.add('is-playing');
-    btn.setAttribute('aria-label', '暂停自动滚动');
-
-    function step() {
-      if (!running) return;
-      var maxScroll = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-      ) - window.innerHeight;
-      var current = window.scrollY;
-
-      if (current >= maxScroll - 1) {
-        // 已到底 → 停止
-        stop();
-        return;
-      }
-
-      var next = Math.min(current + SPEED, maxScroll);
-      window.scrollTo({ top: next, behavior: 'auto' });
-      rafId = requestAnimationFrame(step);
-    }
-
-    rafId = requestAnimationFrame(step);
-  }
-
-  function toggle() {
-    running ? stop() : start();
-  }
-
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    toggle();
-  });
-
-  // 用户手动操作 → 停止自动滚动
-  var STOP_EVENTS = ['wheel', 'touchstart', 'touchmove', 'keydown'];
-  function onUserStop(e) {
-    if (!running) return;
-    // 如果是 tab 键在元素间切换就不要停 — 只停方向键/滚轮等操作
-    if (e.type === 'keydown' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp' &&
-        e.key !== 'PageDown' && e.key !== 'PageUp' && e.key !== 'Home' &&
-        e.key !== 'End' && e.key !== ' ') return;
-    stop();
-  }
-
-  STOP_EVENTS.forEach(function (ev) {
-    document.addEventListener(ev, onUserStop, { passive: true });
-  });
-
-  // 手动滚动（非自动触发）→ 停止
-  var lastScrollY = window.scrollY;
-  document.addEventListener('scroll', function () {
-    if (!running) return;
-    var currentScrollY = window.scrollY;
-    // 如果差值 > SPEED+1，说明是用户手动滚动
-    if (Math.abs(currentScrollY - lastScrollY) > SPEED + 1) {
-      stop();
-    }
-    lastScrollY = currentScrollY;
-  }, { passive: true });
-
-  // 暴露接口以备外部调用
-  window.autoScrollToggle = toggle;
-  window.autoScrollStop = stop;
-  window.autoScrollStart = start;
-})();
-    </script>
-  <script src="../../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../../common-controls.js?v=restore-original-20260726"></script>
 </body>
 </html>

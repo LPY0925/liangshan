@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>绿水青山超卷轴</title>
     <link rel="stylesheet" href="./style.css">
-    <script src="./lib/echarts.min.js?v=2"></script>
+    <script defer src="./lib/echarts.min.js?v=2"></script>
     <style>
 /* ── 目录球 ── */
 .catalog-sphere,
@@ -440,45 +440,7 @@
 
 <body>
     <!-- 目录球 -->
-    <nav class="catalog-sphere" aria-label="章节目录" data-current="陆">
-      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
-        <span class="cs-icon" aria-hidden="true">
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-        </span>
-      </button>
-      <div class="cs-panel" aria-hidden="true">
-        <a class="cs-item" href="../shouye/dist/index.html" data-chapter="开篇">
-          <img class="cs-thumb" src="../images/nav/kaipian.png" alt="">
-          <span class="cs-label">开篇</span>
-        </a>
-        <a class="cs-item" href="../shouye/dist/index.html#chapter-1" data-chapter="壹">
-          <img class="cs-thumb" src="../images/nav/yi.png" alt="">
-          <span class="cs-label">壹 · 第一个坐标</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
-          <img class="cs-thumb" src="../images/nav/er.png" alt="">
-          <span class="cs-label">贰 · 青山为凭</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
-          <img class="cs-thumb" src="../images/nav/san.png" alt="">
-          <span class="cs-label">叁 · 碧空为证</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
-          <img class="cs-thumb" src="../images/nav/si.png" alt="">
-          <span class="cs-label">肆 · 清流为鉴</span>
-        </a>
-        <a class="cs-item" href="../shouye/dist/wu.html" data-chapter="伍">
-          <img class="cs-thumb" src="../images/nav/wu.png" alt="">
-          <span class="cs-label">伍 · 一棵树值多少钱？</span>
-        </a>
-        <a class="cs-item" href="#" data-chapter="陆">
-          <img class="cs-thumb" src="../images/nav/liu.png" alt="">
-          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
-        </a>
-      </div>
-    </nav>
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="陆"></nav>
     <div class="cs-backdrop" aria-hidden="true"></div>
 
 <!-- 背景音乐 -->
@@ -591,8 +553,8 @@
       <div class="region-lightbox-eco" id="regionLightboxEco"></div>
     </div>
 
-    <script src="./data/china.js"></script>
-    <script src="./script.js?v=2"></script>
+    <script defer src="./data/china.js"></script>
+    <script defer src="./script.js?v=structure-speed-20260726"></script>
 
     <script>
     (function () {
@@ -721,62 +683,7 @@
     <!-- 目录球与遮罩：公共实现见 common-controls.js -->
     <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
-<!-- auto-scroll -->
-<script>
-(function(){
-  const btn = document.getElementById('autoScrollBtn');
-  if (!btn) return;
-
-  let ticking = false;
-  let rafId = null;
-
-  function onScroll() {
-    if (!ticking) {
-      window.requestAnimationFrame(function(){
-        const scrollTop = window.scrollY || window.pageYOffset;
-        const docHeight = document.documentElement.scrollHeight;
-        const winHeight = window.innerHeight;
-        const atBottom = (scrollTop + winHeight >= docHeight - 2);
-        if (atBottom) {
-          btn.classList.remove('is-scrolling');
-        } else {
-          btn.classList.add('is-scrolling');
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }
-
-  btn.addEventListener('click', function(){
-    btn.classList.remove('is-scrolling');
-    const docHeight = document.documentElement.scrollHeight;
-    const winHeight = window.innerHeight;
-    const duration = 800;
-    const start = window.scrollY || window.pageYOffset;
-    const distance = docHeight - winHeight - start;
-    const startTime = performance.now();
-
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-
-    function step(currentTime) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutCubic(progress);
-      window.scrollTo(0, start + distance * eased);
-      if (progress < 1) {
-        rafId = window.requestAnimationFrame(step);
-      }
-    }
-    rafId = window.requestAnimationFrame(step);
-  });
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
-  onScroll();
-})();
-</script>
-  <script src="../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../common-controls.js?v=restore-original-20260726"></script>
 </body>
 
 </html>

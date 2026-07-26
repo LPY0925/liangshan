@@ -546,7 +546,7 @@ function makeCard(scene, sceneIndex) {
     card.style.setProperty('--scene-accent', scene.accent);
     card.setAttribute('aria-label', `${scene.title}：${scene.copy}`);
     card.innerHTML = `
-        <img class="card-image" src="${scene.image}" alt="${scene.title}">
+        <img class="card-image" data-src="${scene.image}" alt="${scene.title}" loading="lazy" decoding="async">
         <div class="card-copy">
             <span class="card-kicker">生态样本 ${String(sceneIndex + 1).padStart(2, '0')}</span>
             <span class="card-line">${scene.title}：${scene.copy}</span>
@@ -721,12 +721,15 @@ function initItems() {
 
         if (entry.type === 'card') {
             const position = scenePosition(entry.sceneIndex);
-            el.appendChild(makeCard(entry.scene, entry.sceneIndex));
+            const card = makeCard(entry.scene, entry.sceneIndex);
+            el.appendChild(card);
             items.push({
                 el,
                 type: 'card',
                 sceneIndex: entry.sceneIndex,
                 baseZ: -index * CONFIG.zGap,
+                cardEl: card,
+                cardImage: card.querySelector('.card-image'),
                 ...position
             });
         }
@@ -774,6 +777,18 @@ function bindInput() {
 function renderItem(item, time, cameraZ) {
     const vizZ = item.baseZ + cameraZ;
 
+    if (
+        item.type === 'card' &&
+        item.cardImage &&
+        item.cardImage.dataset.src &&
+        vizZ > -CONFIG.zGap * 4.5 &&
+        vizZ < 900
+    ) {
+        item.cardImage.loading = 'eager';
+        item.cardImage.src = item.cardImage.dataset.src;
+        delete item.cardImage.dataset.src;
+    }
+
     let alpha = 1;
     if (vizZ < -3600) alpha = 0;
     else if (vizZ < -2500) alpha = (vizZ + 3600) / 1100;
@@ -799,7 +814,7 @@ function renderItem(item, time, cameraZ) {
         transform += ` rotateZ(${item.rot}deg) rotateY(${float}deg)`;
 
         /* ── 卡片文字与图片独立渐隐 ── */
-        const cardEl = item.el.querySelector('.card');
+        const cardEl = item.cardEl;
         if (cardEl) {
             let textAlpha = alpha;
 
@@ -836,16 +851,24 @@ const feedbackFPS = document.getElementById('fps');
 const feedbackCoord = document.getElementById('coord');
 let lastTime = 0;
 let lastFpsUpdate = 0;
+let lastRenderTime = 0;
 
 function raf(time) {
-    const delta = lastTime === 0 ? 16.7 : time - lastTime;
+    requestAnimationFrame(raf);
+    const frameInterval = window.innerWidth <= 700 ? 1000 / 30 : 1000 / 45;
+    if (document.hidden || time - lastRenderTime < frameInterval) return;
+
+    const delta = lastTime === 0 ? frameInterval : time - lastTime;
     lastTime = time;
+    lastRenderTime = time;
     syncScrollStateFromPage(window.scrollY);
 
     const diff = state.targetScroll - state.scroll;
-    state.scroll += diff * 0.16;
+    const scrollBlend = 1 - Math.pow(1 - 0.16, delta / 16.7);
+    const velocityBlend = 1 - Math.pow(1 - 0.14, delta / 16.7);
+    state.scroll += diff * scrollBlend;
     if (Math.abs(diff) < 0.08) state.scroll = state.targetScroll;
-    state.velocity += (diff - state.velocity) * 0.14;
+    state.velocity += (diff - state.velocity) * velocityBlend;
 
     if (delta > 0 && time - lastFpsUpdate > 250) {
         if (feedbackFPS) feedbackFPS.textContent = Math.round(1000 / delta);
@@ -859,8 +882,9 @@ function raf(time) {
     const tiltY = state.mouseX * 3.2;
 
     if (introMaskCursorGlow) {
-        state.maskGlowX += (state.maskMouseX - state.maskGlowX) * 0.08;
-        state.maskGlowY += (state.maskMouseY - state.maskGlowY) * 0.08;
+        const cursorBlend = 1 - Math.pow(1 - 0.08, delta / 16.7);
+        state.maskGlowX += (state.maskMouseX - state.maskGlowX) * cursorBlend;
+        state.maskGlowY += (state.maskMouseY - state.maskGlowY) * cursorBlend;
         introMaskCursorGlow.style.left = `${state.maskGlowX}px`;
         introMaskCursorGlow.style.top = `${state.maskGlowY}px`;
     }
@@ -875,8 +899,6 @@ function raf(time) {
 
     const cameraZ = state.scroll * CONFIG.camSpeed;
     items.forEach((item) => renderItem(item, time, cameraZ));
-
-    requestAnimationFrame(raf);
 }
 
 init();

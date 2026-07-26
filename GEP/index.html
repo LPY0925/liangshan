@@ -746,55 +746,6 @@
 })();
 </script>
 
-<!-- 自动滚动按钮 -->
-<button class="auto-scroll-btn" id="autoScrollBtn" title="自动滚动">▶</button>
-
-<script>
-(function(){
-  var btn = document.getElementById('autoScrollBtn');
-  var playing = false;
-  var timer = null;
-  var wrapper = document.querySelector('.animation-wrapper');
-  if (!wrapper) wrapper = document.body;
-
-  function getSpeed() {
-    var w = window.innerWidth;
-    if (w < 480) return 0.4;
-    if (w < 768) return 0.6;
-    return 1.0;
-  }
-
-  function step() {
-    if (!playing) return;
-    var speed = getSpeed();
-    var viewH = window.innerHeight;
-    var maxY = wrapper.scrollHeight - viewH;
-    var curY = window.scrollY;
-    var nextY = Math.min(curY + speed, maxY);
-    window.scrollTo(0, nextY);
-    if (nextY >= maxY) {
-      playing = false;
-      btn.classList.remove('playing');
-      btn.textContent = '▶';
-      return;
-    }
-    timer = requestAnimationFrame(step);
-  }
-
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    if (playing) {
-      btn.classList.add('playing');
-      btn.textContent = '⏸';
-      step();
-    } else {
-      btn.classList.remove('playing');
-      btn.textContent = '▶';
-      if (timer) cancelAnimationFrame(timer);
-    }
-  });
-})();
-</script>
-  <script src="../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../common-controls.js?v=restore-original-20260726"></script>
 </body>
 </html>

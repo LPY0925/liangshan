@@ -1,6 +1,7 @@
 (function () {
 	"use strict";
 	let velocity = 0;
+	let frameRequest = 0;
 	const ease = 0.12;
 	const friction = 0.92;
 	const storyCompleteAnchor = 0.22;
@@ -708,7 +709,9 @@
 				pct: p,
 				section: s,
 				layerCount: layers.length,
-				wrapper: w
+				wrapper: w,
+				lastPercent: "",
+				lastStage: -1
 			});
 		}
 	}
@@ -778,6 +781,12 @@
 	let targetScrollPosition = null;
 	const scrollEase = 0.08;
 
+	function requestFrame() {
+		if (!frameRequest && !document.hidden) {
+			frameRequest = requestAnimationFrame(frame);
+		}
+	}
+
 	function scrollToStage(comparatorIndex, stageIndex) {
 		const data = comparatorData[comparatorIndex];
 		if (!data) return;
@@ -790,6 +799,7 @@
 
 		const stageDuration = duration / (stageCount - 1);
 		targetScrollPosition = offset + stageDuration * stageIndex;
+		requestFrame();
 	}
 
 	function onIndicatorClick(e) {
@@ -816,6 +826,7 @@
 		e.preventDefault();
 		targetScrollPosition = null;
 		velocity += e.deltaY;
+		requestFrame();
 	}
 
 	let resizeTimeout;
@@ -827,6 +838,7 @@
 		resizeTimeout = setTimeout(() => {
 			syncStoryTimings();
 			updateOffsets();
+			requestFrame();
 		}, 150);
 	}
 
@@ -837,6 +849,8 @@
 	}
 
 	function frame() {
+		frameRequest = 0;
+
 		if (targetScrollPosition !== null) {
 			const current = window.scrollY;
 			const delta = targetScrollPosition - current;
@@ -859,19 +873,36 @@
 				parseFloat(
 					getComputedStyle(d.comp).getPropertyValue("--scroll-progress")
 				) || 0;
-			d.pct.textContent = (Math.round(v) + "").padStart(2, "0") + "%";
+			const percentText = (Math.round(v) + "").padStart(2, "0") + "%";
+			if (percentText !== d.lastPercent) {
+				d.pct.textContent = percentText;
+				d.lastPercent = percentText;
+			}
 
+			if (!d.indicators) continue;
 			const currentStage = Math.round((v / 100) * (d.layerCount - 1));
-			d.indicators.forEach((indicator, idx) => {
-				indicator.classList.toggle("active", idx === currentStage);
-			});
+			if (currentStage !== d.lastStage) {
+				d.indicators.forEach((indicator, idx) => {
+					indicator.classList.toggle("active", idx === currentStage);
+				});
+				d.lastStage = currentStage;
+			}
 		}
-		requestAnimationFrame(frame);
+
+		if (
+			targetScrollPosition !== null ||
+			velocity > 0.2 ||
+			velocity < -0.2
+		) {
+			requestFrame();
+		}
 	}
 
 	window.addEventListener("wheel", onWheel, { passive: false });
+	window.addEventListener("scroll", requestFrame, { passive: true });
 	window.addEventListener("resize", onResize, { passive: true });
 	window.addEventListener("mousedown", onMouseDown, { passive: true });
+	document.addEventListener("visibilitychange", requestFrame);
 	document.addEventListener("click", onIndicatorClick);
 
 	hydrateStoryPanels();
@@ -887,7 +918,7 @@
 				updateOffsets();
 			});
 		}
-	requestAnimationFrame(frame);
+	requestFrame();
   });
 
   window.__catalogScrollTo = function(chapterId) {

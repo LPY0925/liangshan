@@ -16,6 +16,15 @@
   var SESSION_KEY_USER_PAUSE = "liangshan_music_up";
   var SESSION_KEY_TS = "liangshan_music_ts";
   var _musicSaveTimer = null;
+  var CATALOG_ITEMS = [
+    { chapter: "开篇", label: "开篇", path: "shouye/dist/index.html", image: "开篇.webp" },
+    { chapter: "壹", label: "壹 · 第一个坐标", path: "shouye/dist/index.html#chapter-1", image: "壹.webp" },
+    { chapter: "贰", label: "贰 · 青山为凭", path: "sancengshijianbianhuan/index.html#chapter-2", image: "贰.webp" },
+    { chapter: "叁", label: "叁 · 碧空为证", path: "sancengshijianbianhuan/index.html#chapter-3", image: "叁.webp" },
+    { chapter: "肆", label: "肆 · 清流为鉴", path: "sancengshijianbianhuan/index.html#chapter-4", image: "肆.webp" },
+    { chapter: "伍", label: "伍 · 一棵树值多少钱？", path: "shouye/dist/wu.html", image: "伍.webp" },
+    { chapter: "陆", label: "陆 · 675+331，1006个绿色坐标", path: "chaojuanzhou/index.html", image: "陆.webp" }
+  ];
 
   function saveMusicState(audio) {
     if (!audio || audio.readyState === 0) return;
@@ -59,7 +68,7 @@
 
   function startSavingMusicState(audio) {
     if (_musicSaveTimer) clearInterval(_musicSaveTimer);
-    _musicSaveTimer = setInterval(function () { saveMusicState(audio); }, 300);
+    _musicSaveTimer = setInterval(function () { saveMusicState(audio); }, 1000);
   }
 
   function stopSavingMusicState() {
@@ -287,6 +296,9 @@
     var button = cleanButton("autoScrollBtn", "auto-scroll-btn");
     var rafId = 0;
     var running = false;
+    var lastTime = 0;
+    var maxScroll = 0;
+    var maxScrollUpdatedAt = 0;
 
     button.innerHTML = icon("scrollPlay") + icon("scrollPause");
     button.title = labels.scrollTitle;
@@ -315,13 +327,20 @@
         window.cancelAnimationFrame(rafId);
         rafId = 0;
       }
+      lastTime = 0;
       sync();
     }
 
-    function step() {
+    function step(now) {
       if (!running) return;
-      var max = scrollMax();
+      if (!maxScroll || now - maxScrollUpdatedAt > 500) {
+        maxScroll = scrollMax();
+        maxScrollUpdatedAt = now;
+      }
+      var max = maxScroll;
       var current = window.scrollY || document.documentElement.scrollTop || 0;
+      var delta = lastTime ? Math.min(32, now - lastTime) : 16.7;
+      lastTime = now;
 
       if (max <= 0 || current >= max - 1) {
         window.scrollTo(0, Math.max(0, max));
@@ -329,13 +348,16 @@
         return;
       }
 
-      window.scrollTo(0, Math.min(current + speed(), max));
+      window.scrollTo(0, Math.min(current + speed() * (delta / 16.7), max));
       rafId = window.requestAnimationFrame(step);
     }
 
     function start() {
       if (running) return;
       running = true;
+      maxScroll = scrollMax();
+      maxScrollUpdatedAt = performance.now();
+      lastTime = 0;
       sync();
       rafId = window.requestAnimationFrame(step);
     }
@@ -374,7 +396,7 @@
     }
 
     function update() {
-      var open = Boolean(sphere && sphere.classList.contains("is-open"));
+      var open = !sphere || sphere.classList.contains("is-open");
       document.body.classList.toggle("liangshan-catalog-open", open);
       setInteractive(document.getElementById("bgMusicBtn"), open);
       setInteractive(document.getElementById("autoScrollBtn"), open);
@@ -387,23 +409,6 @@
       observer.observe(sphere, { attributes: true, attributeFilter: ["class"] });
     }
 
-    window.addEventListener("beforeunload", function () {
-      if (observer) observer.disconnect();
-    });
-  }
-
-  function init() {
-    if (!document.body) return;
-    injectStyle();
-    setupMusic();
-    setupAutoScroll();
-    setupCatalogVisibility();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, { once: true });
-  } else {
-    init();
   }
 
   // ── 公共：页面切换遮罩触发 ──
@@ -455,10 +460,70 @@
     window.scrollTo({ top: top, behavior: "smooth" });
   }
 
+  function catalogHref(path) {
+    var target = new URL(path, rootUrl);
+    var current = new URL(window.location.href);
+    if (target.pathname === current.pathname) {
+      return target.hash || "#";
+    }
+    return target.href;
+  }
+
+  function hydrateCatalogSphere(sphere) {
+    if (!sphere || sphere.querySelector(".cs-toggle")) return;
+
+    var toggle = document.createElement("button");
+    toggle.className = "cs-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "打开目录");
+    toggle.innerHTML = [
+      '<span class="cs-icon" aria-hidden="true">',
+      '<span class="cs-bar"></span>',
+      '<span class="cs-bar"></span>',
+      '<span class="cs-bar"></span>',
+      "</span>"
+    ].join("");
+
+    var panel = document.createElement("div");
+    panel.className = "cs-panel";
+    panel.setAttribute("aria-hidden", "true");
+
+    CATALOG_ITEMS.forEach(function (entry) {
+      var item = document.createElement("a");
+      var image = document.createElement("img");
+      var label = document.createElement("span");
+
+      item.className = "cs-item";
+      item.href = catalogHref(entry.path);
+      item.setAttribute("data-chapter", entry.chapter);
+
+      image.className = "cs-thumb";
+      image.src = new URL("images/导航缩略图/" + entry.image, rootUrl).href;
+      image.alt = "";
+      image.width = 512;
+      image.height = 320;
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.setAttribute("fetchpriority", "low");
+
+      label.className = "cs-label";
+      label.textContent = entry.label;
+
+      item.appendChild(image);
+      item.appendChild(label);
+      panel.appendChild(item);
+    });
+
+    sphere.appendChild(toggle);
+    sphere.appendChild(panel);
+  }
+
   // ── 公共：目录球交互（消除每页 ~80 行重复） ──
   function setupCatalogSphere() {
     var sphere = document.querySelector(".catalog-sphere");
     if (!sphere) return;
+    hydrateCatalogSphere(sphere);
     var toggle = sphere.querySelector(".cs-toggle");
     var panel = sphere.querySelector(".cs-panel");
     var backdrop = document.querySelector(".cs-backdrop");
@@ -548,8 +613,8 @@
     injectStyle();
     setupMusic();
     setupAutoScroll();
-    setupCatalogVisibility();
     setupCatalogSphere();
+    setupCatalogVisibility();
     setupTransitionLinks();
   }
 
@@ -559,7 +624,7 @@
     init();
   }
 
-  window.addEventListener("beforeunload", function () {
+  window.addEventListener("pagehide", function () {
     if (stopAutoScroll) stopAutoScroll();
     var audio = document.getElementById("bgMusic");
     if (audio) {

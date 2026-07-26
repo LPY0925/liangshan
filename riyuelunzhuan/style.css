@@ -106,13 +106,11 @@ body.chart-expanded {
 .story-card.left {
   left: auto;
   right: var(--story-right-offset);
-  --story-paper-image: url("../images/liangshanzhutixuanzhiwenziKapianjinbobianshi.png");
   transform: translate3d(0, var(--story-scroll-y), 0);
 }
 
 .story-card.right {
   right: var(--story-right-offset);
-  --story-paper-image: url("../images/liangshanzhutixuanzhiwenziKapianshuimoliubai.png");
   transform: translate3d(0, var(--story-scroll-y), 0);
 }
 

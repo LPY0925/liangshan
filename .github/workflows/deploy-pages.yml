@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: 验证网页结构
+        run: node "工具/验证网页结构.mjs"
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

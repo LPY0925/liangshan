@@ -1132,45 +1132,7 @@
 
   <body>
     <!-- 目录球 -->
-    <nav class="catalog-sphere" aria-label="章节目录" data-current="伍">
-      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
-        <span class="cs-icon" aria-hidden="true">
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-        </span>
-      </button>
-      <div class="cs-panel" aria-hidden="true">
-        <a class="cs-item" href="index.html" data-chapter="开篇">
-          <img class="cs-thumb" src="../../images/nav/kaipian.png" alt="">
-          <span class="cs-label">开篇</span>
-        </a>
-        <a class="cs-item" href="index.html#chapter-1" data-chapter="壹">
-          <img class="cs-thumb" src="../../images/nav/yi.png" alt="">
-          <span class="cs-label">壹 · 第一个坐标</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
-          <img class="cs-thumb" src="../../images/nav/er.png" alt="">
-          <span class="cs-label">贰 · 青山为凭</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
-          <img class="cs-thumb" src="../../images/nav/san.png" alt="">
-          <span class="cs-label">叁 · 碧空为证</span>
-        </a>
-        <a class="cs-item" href="../../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
-          <img class="cs-thumb" src="../../images/nav/si.png" alt="">
-          <span class="cs-label">肆 · 清流为鉴</span>
-        </a>
-        <a class="cs-item" href="wu.html" data-chapter="伍">
-          <img class="cs-thumb" src="../../images/nav/wu.png" alt="">
-          <span class="cs-label">伍 · 一棵树值多少钱？</span>
-        </a>
-        <a class="cs-item" href="../../chaojuanzhou/index.html" data-chapter="陆">
-          <img class="cs-thumb" src="../../images/nav/liu.png" alt="">
-          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
-        </a>
-      </div>
-    </nav>
+    <nav class="catalog-sphere" aria-label="章节目录" data-current="伍"></nav>
     <div class="cs-backdrop" aria-hidden="true"></div>
 
 <!-- 背景音乐 -->
@@ -2025,53 +1987,6 @@
     <!-- 目录球与遮罩：公共实现见 common-controls.js -->
     <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
-<!-- 自动滚动 -->
-<script>
-(function () {
-  const btn = document.getElementById('autoScrollBtn');
-  if (!btn) return;
-
-  let timer = null;
-  const SCROLL_SPEED = 1.2; // px per frame (~72px/s at 60fps)
-
-  function stop() {
-    if (timer) {
-      cancelAnimationFrame(timer);
-      timer = null;
-    }
-    btn.classList.remove('is-scrolling');
-    btn.setAttribute('aria-label', '自动滚动');
-  }
-
-  function frame() {
-    const sy = window.scrollY;
-    const maxY = document.documentElement.scrollHeight - window.innerHeight;
-    if (sy >= maxY - 2) { stop(); return; }
-    window.scrollBy(0, SCROLL_SPEED);
-    timer = requestAnimationFrame(frame);
-  }
-
-  function start() {
-    if (timer) stop();
-    btn.classList.add('is-scrolling');
-    btn.setAttribute('aria-label', '暂停自动滚动');
-    timer = requestAnimationFrame(frame);
-  }
-
-  btn.addEventListener('click', function () {
-    if (timer) { stop(); }
-    else { start(); }
-  });
-
-  // 用户手动滚动时停止自动滚动
-  window.addEventListener('wheel', function () {
-    if (timer) stop();
-  }, { passive: true });
-  window.addEventListener('touchmove', function () {
-    if (timer) stop();
-  }, { passive: true });
-})();
-    </script>
-  <script src="../../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../../common-controls.js?v=restore-original-20260726"></script>
 </body>
 </html>

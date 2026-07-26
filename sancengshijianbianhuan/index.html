@@ -337,45 +337,7 @@
     
   <body>
   <!-- 目录球 -->
-  <nav class="catalog-sphere" aria-label="章节目录" data-current="贰,叁,肆">
-    <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
-      <span class="cs-icon" aria-hidden="true">
-        <span class="cs-bar"></span>
-        <span class="cs-bar"></span>
-        <span class="cs-bar"></span>
-      </span>
-    </button>
-    <div class="cs-panel" aria-hidden="true">
-      <a class="cs-item" href="../shouye/dist/index.html" data-chapter="开篇">
-        <img class="cs-thumb" src="../images/nav/kaipian.png" alt="">
-        <span class="cs-label">开篇</span>
-      </a>
-      <a class="cs-item" href="../shouye/dist/index.html#chapter-1" data-chapter="壹">
-        <img class="cs-thumb" src="../images/nav/yi.png" alt="">
-        <span class="cs-label">壹 · 第一个坐标</span>
-      </a>
-      <a class="cs-item" href="#chapter-2" data-chapter="贰">
-        <img class="cs-thumb" src="../images/nav/er.png" alt="">
-        <span class="cs-label">贰 · 青山为凭</span>
-      </a>
-      <a class="cs-item" href="#chapter-3" data-chapter="叁">
-        <img class="cs-thumb" src="../images/nav/san.png" alt="">
-        <span class="cs-label">叁 · 碧空为证</span>
-      </a>
-      <a class="cs-item" href="#chapter-4" data-chapter="肆">
-        <img class="cs-thumb" src="../images/nav/si.png" alt="">
-        <span class="cs-label">肆 · 清流为鉴</span>
-      </a>
-      <a class="cs-item" href="../shouye/dist/wu.html" data-chapter="伍">
-        <img class="cs-thumb" src="../images/nav/wu.png" alt="">
-        <span class="cs-label">伍 · 一棵树值多少钱？</span>
-      </a>
-      <a class="cs-item" href="../chaojuanzhou/index.html" data-chapter="陆">
-        <img class="cs-thumb" src="../images/nav/liu.png" alt="">
-        <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
-      </a>
-    </div>
-  </nav>
+  <nav class="catalog-sphere" aria-label="章节目录" data-current="贰,叁,肆"></nav>
   <div class="cs-backdrop" aria-hidden="true"></div>
 
 <!-- 背景音乐 -->
@@ -789,54 +751,12 @@
       <div class="return-transition-panel return-transition-panel--right"></div>
     </div>
 
-    <script src="./script.js?v=return-transition-20260623b"></script>
+    <script src="./script.js?v=structure-speed-20260726"></script>
 
     <!-- 目录球与遮罩：公共实现见 common-controls.js -->
     <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
-  
-    <!-- 自动滚动 -->
-    <script>
-    (function(){
-      var btn = document.getElementById('autoScrollBtn');
-      if (!btn) return;
-      var speed = 0.5;           // px per tick
-      var interval = 30;         // ms per tick
-      var timer = null;
-      var isScrolling = false;
-
-      function startScroll() {
-        if (timer) return;
-        timer = setInterval(function(){
-          window.scrollBy(0, speed);
-        }, interval);
-        isScrolling = true;
-        btn.classList.add('is-scrolling');
-        btn.setAttribute('aria-label', '暂停自动滚动');
-      }
-
-      function stopScroll() {
-        if (timer) { clearInterval(timer); timer = null; }
-        isScrolling = false;
-        btn.classList.remove('is-scrolling');
-        btn.setAttribute('aria-label', '自动滚动');
-      }
-
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        isScrolling ? stopScroll() : startScroll();
-      });
-
-      ['wheel','touchstart','touchmove','keydown'].forEach(function(ev) {
-        document.addEventListener(ev, function(e) {
-          if (!isScrolling) return;
-          if (e.type === 'keydown' && !['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(e.key)) return;
-          stopScroll();
-        }, { passive: true });
-      });
-    })();
-    </script>
-  <script src="../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../common-controls.js?v=restore-original-20260726"></script>
 </body>
   
 </html>

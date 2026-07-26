@@ -314,45 +314,7 @@
 
   <body>
     <!-- 目录球 -->
-    <nav class="catalog-sphere" aria-label="章节目录" data-current="">
-      <button class="cs-toggle" type="button" aria-expanded="false" aria-label="打开目录">
-        <span class="cs-icon" aria-hidden="true">
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-          <span class="cs-bar"></span>
-        </span>
-      </button>
-      <div class="cs-panel" aria-hidden="true">
-        <a class="cs-item" href="../shouye/dist/index.html" data-chapter="开篇">
-          <img class="cs-thumb" src="../images/nav/kaipian.png" alt="">
-          <span class="cs-label">开篇</span>
-        </a>
-        <a class="cs-item" href="../shouye/dist/index.html#chapter-1" data-chapter="壹">
-          <img class="cs-thumb" src="../images/nav/yi.png" alt="">
-          <span class="cs-label">壹 · 第一个坐标</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-2" data-chapter="贰">
-          <img class="cs-thumb" src="../images/nav/er.png" alt="">
-          <span class="cs-label">贰 · 青山为凭</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-3" data-chapter="叁">
-          <img class="cs-thumb" src="../images/nav/san.png" alt="">
-          <span class="cs-label">叁 · 碧空为证</span>
-        </a>
-        <a class="cs-item" href="../sancengshijianbianhuan/index.html#chapter-4" data-chapter="肆">
-          <img class="cs-thumb" src="../images/nav/si.png" alt="">
-          <span class="cs-label">肆 · 清流为鉴</span>
-        </a>
-        <a class="cs-item" href="../shouye/dist/wu.html" data-chapter="伍">
-          <img class="cs-thumb" src="../images/nav/wu.png" alt="">
-          <span class="cs-label">伍 · 一棵树值多少钱？</span>
-        </a>
-        <a class="cs-item" href="../chaojuanzhou/index.html" data-chapter="陆">
-          <img class="cs-thumb" src="../images/nav/liu.png" alt="">
-          <span class="cs-label">陆 · 675+331，1006个绿色坐标</span>
-        </a>
-      </div>
-    </nav>
+    <nav class="catalog-sphere" aria-label="章节目录" data-current=""></nav>
     <div class="cs-backdrop" aria-hidden="true"></div>
 
     <!-- 背景音乐 -->
@@ -720,69 +682,12 @@
       <span class="transition-overlay__pane transition-overlay__pane--right" aria-hidden="true"></span>
     </div>
 
-    <script src="./script.js?v=copy-v3"></script>
+    <script src="./script.js?v=structure-speed-20260726"></script>
 
     <!-- 目录球与遮罩：公共实现见 common-controls.js -->
     <!-- ponytail: 内联目录球重复代码已删除，由 common-controls.js 统一接管 -->
 
-<script>
-(function() {
-  'use strict';
-
-  const btn    = document.getElementById('autoScrollBtn');
-  const scene  = document.getElementById('scene');
-  if (!btn || !scene) return;
-
-  let active = false;
-  let rafId  = null;
-  const SPEED = 0.35; /* px per frame */
-
-  function tick() {
-    if (!active) return;
-    /* 如果页面内容比视口高才需要滚动 */
-    const maxY = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight
-    ) - window.innerHeight;
-    if (maxY <= 0) { stop(); return; }
-
-    const next = window.scrollY + SPEED;
-    if (next >= maxY) {
-      window.scrollTo(0, maxY);
-      stop();
-      return;
-    }
-    window.scrollTo(0, next);
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function start() {
-    if (active) return;
-    active = true;
-    btn.classList.add('is-active');
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function stop() {
-    if (!active && rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-    active = false;
-    btn.classList.remove('is-active');
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-  }
-
-  btn.addEventListener('click', function() {
-    if (active) { stop(); }
-    else        { start(); }
-  });
-})();
-</script>
-  <script src="../common-controls.js?v=controls-menu-spin-20260627"></script>
+  <script src="../common-controls.js?v=restore-original-20260726"></script>
 </body>
 
 </html>

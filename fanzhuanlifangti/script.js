@@ -254,14 +254,21 @@ resize();
 let tgt = 0;
 let smooth = 0;
 let velocity = 0;
+let frameRequest = 0;
 
 const ease = 0.1;
 const dynamicFriction = (v) => (Math.abs(v) > 200 ? 0.8 : 0.9);
+const requestFrame = () => {
+  if (!frameRequest && !document.hidden) {
+    frameRequest = requestAnimationFrame(frame);
+  }
+};
 
 window.addEventListener("resize", () => {
   resize();
   tgt = maxScroll > 0 ? scrollY / maxScroll : 0;
   smooth = tgt;
+  requestFrame();
 });
 
 let resizePending = false;
@@ -273,6 +280,7 @@ const ro = new ResizeObserver(() => {
     tgt = maxScroll > 0 ? scrollY / maxScroll : 0;
     smooth = tgt;
     resizePending = false;
+    requestFrame();
   });
 });
 ro.observe(document.documentElement);
@@ -282,6 +290,7 @@ window.addEventListener(
   () => {
     tgt = maxScroll > 0 ? scrollY / maxScroll : 0;
     tgt = Math.max(0, Math.min(1, tgt));
+    requestFrame();
   },
   { passive: true }
 );
@@ -302,6 +311,7 @@ window.addEventListener(
     stopAnchorAnim();
     velocity += delta;
     velocity = Math.max(-600, Math.min(600, velocity));
+    requestFrame();
   },
   { passive: false }
 );
@@ -327,7 +337,7 @@ revealEls.forEach((el) => io.observe(el));
 let lastNow = performance.now();
 
 const frame = (now) => {
-  requestAnimationFrame(frame);
+  frameRequest = 0;
 
   if (document.hidden) {
     lastNow = now;
@@ -352,9 +362,14 @@ const frame = (now) => {
   updateHUD(smooth);
   checkImageSwaps(smooth);
   setCubeTransform(smooth);
+
+  if (Math.abs(velocity) > 0.01 || Math.abs(tgt - smooth) > 0.0001) {
+    requestFrame();
+  }
 };
 
-requestAnimationFrame(frame);
+document.addEventListener("visibilitychange", requestFrame);
+requestFrame();
 
 let anchorAnim = null;
 let isAnchorScrolling = false;

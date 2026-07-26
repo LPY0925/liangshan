@@ -53,6 +53,8 @@ let maskMouseX = 0;
 let maskMouseY = 0;
 let maskGlowX = 0;
 let maskGlowY = 0;
+let storyCardHeights = [];
+let storyChartBottom = 48;
 
 const SUN_CENTER_PROGRESS = 0.29;
 const DAY_NIGHT_ROTATIONS = 6 + SUN_CENTER_PROGRESS;
@@ -67,6 +69,9 @@ const SUN_RADIUS_SCALE = 0.055;
 const FINAL_STORY_HOLD_LOCAL = 0.88;
 const STORY_CARD_MOBILE_BREAKPOINT = 980;
 const GRAPH_REVEAL_STEP = 1.6;
+const storyMobileQuery = window.matchMedia(
+  `(max-width: ${STORY_CARD_MOBILE_BREAKPOINT}px)`
+);
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -504,20 +509,26 @@ const getStoryScrollProgress = () => {
   return embeddedStage ? clamp01(progress) : progress;
 };
 
+const measureStoryLayout = () => {
+  storyChartBottom =
+    parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--chart-bottom")
+    ) || 48;
+  storyCardHeights = storyCards.map(
+    (card) => card.offsetHeight || card.getBoundingClientRect().height || 300
+  );
+};
+
 const updateStoryCards = (scrollProgress) => {
   if (!storyCards.length) return;
 
   const p = clamp01(scrollProgress);
   const viewportH = H || window.innerHeight || 1;
-  const chartBottom =
-    parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--chart-bottom")
-    ) || 48;
+  const chartBottom = storyChartBottom;
   const mobileLayout =
-    (typeof window.matchMedia === "function" &&
-      window.matchMedia(`(max-width: ${STORY_CARD_MOBILE_BREAKPOINT}px)`).matches) ||
-    window.innerWidth <= STORY_CARD_MOBILE_BREAKPOINT;
+    storyMobileQuery.matches || window.innerWidth <= STORY_CARD_MOBILE_BREAKPOINT;
   const finalIndex = storyCards.length - 1;
+  const chartRect = mobileLayout ? chartAnchor?.getBoundingClientRect() : null;
 
   storyCards.forEach((card, index) => {
     const isFirstCard = index === 0;
@@ -531,8 +542,7 @@ const updateStoryCards = (scrollProgress) => {
     let targetY;
     let enterY;
 
-    const chartRect = chartAnchor?.getBoundingClientRect();
-    const cardHeight = card.offsetHeight || card.getBoundingClientRect().height || 300;
+    const cardHeight = storyCardHeights[index] || 300;
 
     if (mobileLayout) {
       enterY = viewportH * 1.08;
@@ -823,7 +833,7 @@ const resize = () => {
 
   if (!W || !H) return;
 
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  DPR = Math.min(window.devicePixelRatio || 1, W <= 980 ? 1.25 : 1.5);
   canvas.width = Math.max(1, Math.round(W * DPR));
   canvas.height = Math.max(1, Math.round(H * DPR));
   canvas.style.width = `${W}px`;
@@ -837,6 +847,7 @@ const resize = () => {
     ? Math.max(1, embeddedStage.offsetHeight - H - introMaskScroll)
     : Math.max(1, document.documentElement.scrollHeight - H);
   tgt = getStoryScrollProgress();
+  measureStoryLayout();
   updateSunIntroMask();
 };
 
@@ -851,7 +862,12 @@ setupChartExpand();
 setupChartFlip();
 setupSunMaskCursor();
 updateStoryCards(0);
-window.setInterval(() => updateStoryCards(getStoryScrollProgress()), 160);
+if (document.fonts?.ready) {
+  document.fonts.ready.then(() => {
+    measureStoryLayout();
+    updateStoryCards(getStoryScrollProgress());
+  });
+}
 
 window.addEventListener("resize", requestResize, { passive: true });
 
@@ -864,10 +880,13 @@ if (window.visualViewport) {
 window.addEventListener(
   "scroll",
   () => {
-    tgt = getStoryScrollProgress();
+    const progress = getStoryScrollProgress();
+    tgt = progress;
     updateSunIntroMask();
-    updateStoryCards(getStoryScrollProgress());
-    updateChartExpandAvailability(getStoryScrollProgress());
+    if (stageInView) {
+      updateStoryCards(progress);
+      updateChartExpandAvailability(progress);
+    }
     if (chartTooltip && !chartTooltip.hidden) hideChartTooltip();
   },
   { passive: true }
@@ -991,7 +1010,8 @@ const drawSky = (P, sun, T) => {
 };
 
 const drawOcean = (P, sun, T) => {
-  const waveCount = 26;
+  const waveCount = W <= 700 ? 18 : 22;
+  const sampleStep = W <= 700 ? 10 : 8;
 
   for (let i = 0; i < waveCount; i++) {
     const depth = i / (waveCount - 1);
@@ -1006,7 +1026,7 @@ const drawOcean = (P, sun, T) => {
     ctx.moveTo(0, H);
     ctx.lineTo(0, yTop + Math.sin(phase) * amp);
 
-    for (let x = 0; x <= W; x += 6) {
+    for (let x = 0; x <= W; x += sampleStep) {
       const y =
         yTop +
         Math.sin(x / wlen + phase) * amp +
@@ -1023,7 +1043,7 @@ const drawOcean = (P, sun, T) => {
     ctx.beginPath();
 
     let started = false;
-    for (let x = 0; x <= W; x += 6) {
+    for (let x = 0; x <= W; x += sampleStep) {
       const y =
         yTop +
         Math.sin(x / wlen + phase) * amp +
@@ -1040,7 +1060,7 @@ const drawOcean = (P, sun, T) => {
 
     if (depth > 0.62) {
       const foamA = (depth - 0.62) / 0.38;
-      for (let x = 0; x <= W; x += 9) {
+      for (let x = 0; x <= W; x += sampleStep + 3) {
         const y =
           yTop +
           Math.sin(x / wlen + phase) * amp +
@@ -1061,7 +1081,8 @@ const drawOcean = (P, sun, T) => {
   }
 
   if (sun.visible) {
-    for (let i = 0; i < 220; i++) {
+    const shimmerCount = W <= 700 ? 120 : 170;
+    for (let i = 0; i < shimmerCount; i++) {
       const dy = Math.random();
       const y = horizonY + Math.pow(dy, 1.5) * oceanH;
       const spread = lerp(6, W * 0.3, dy);
@@ -1096,12 +1117,27 @@ const drawVignette = () => {
 
 let T = 0;
 let lastNow = performance.now();
+let lastCanvasRender = 0;
+let stageInView = true;
+const canvasFrameInterval = () => 1000 / (W <= 980 ? 30 : 40);
+
+if (embeddedStage && "IntersectionObserver" in window) {
+  const stageObserver = new IntersectionObserver(
+    (entries) => {
+      stageInView = entries.some((entry) => entry.isIntersecting);
+    },
+    { rootMargin: "35% 0px" }
+  );
+  stageObserver.observe(embeddedStage);
+}
 
 const frame = (now) => {
   requestAnimationFrame(frame);
 
   const dt = Math.min((now - lastNow) * 0.001, 0.033);
   lastNow = now;
+  if (document.hidden || !stageInView) return;
+
   const introMaskComplete = !embeddedStage || !sunIntroMask || getIntroMaskProgress() >= 0.995;
   if (introMaskComplete) {
     T += dt;
@@ -1123,6 +1159,14 @@ const frame = (now) => {
   updateSunIntroMask();
   updateSunMaskCursor();
 
+  const storyProgress = getStoryScrollProgress();
+  updateScrollGraph(smooth);
+  updateStoryCards(storyProgress);
+  updateChartExpandAvailability(storyProgress);
+
+  if (now - lastCanvasRender < canvasFrameInterval()) return;
+  lastCanvasRender = now;
+
   const dayProgress = getDayNightProgress(smooth);
   const P = getPalette(dayProgress);
   const sun = getSunPosition(dayProgress);
@@ -1130,9 +1174,6 @@ const frame = (now) => {
   drawSky(P, sun, T);
   drawOcean(P, sun, T);
   drawVignette();
-  updateScrollGraph(smooth);
-  updateStoryCards(getStoryScrollProgress());
-  updateChartExpandAvailability(getStoryScrollProgress());
 };
 
 requestAnimationFrame(frame);
