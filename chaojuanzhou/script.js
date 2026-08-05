@@ -182,42 +182,42 @@ const provinceToPinyin = {
 };
 
 const REGION_MAP_DATA = [
-    { name: '北京市', short: '北京', value: 98,   ecoDemo: 6,  twoMountains: 8,  total: 14, tagline: '钢铁与青山的和解，从首钢园开始' },
-    { name: '天津市', short: '天津', value: 42,   ecoDemo: 5,  twoMountains: 5,  total: 10, tagline: '九河入海处，绿意润津门' },
-    { name: '河北省', short: '河北', value: 62,   ecoDemo: 19, twoMountains: 9,  total: 28, tagline: '塞罕坝的松涛，是荒原对未来的承诺' },
-    { name: '山西省', short: '山西', value: 68,   ecoDemo: 16, twoMountains: 8,  total: 24, tagline: '黑金褪去，绿染山河——每一种转型都需要勇气' },
-    { name: '内蒙古自治区', short: '内蒙古', value: 38, ecoDemo: 18, twoMountains: 8,  total: 26, tagline: '草原辽阔处，绿色是永恒的信仰' },
-    { name: '辽宁省', short: '辽宁', value: 55,   ecoDemo: 16, twoMountains: 7,  total: 23, tagline: '深坑育果，大地回春——每一寸废矿都能重生' },
-    { name: '吉林省', short: '吉林', value: 40,   ecoDemo: 15, twoMountains: 8,  total: 23, tagline: '白山松水间，守护是最长情的告白' },
-    { name: '黑龙江省', short: '黑龙江', value: 48, ecoDemo: 14, twoMountains: 7,  total: 21, tagline: '林海雪原之下，是万物生长的根基' },
-    { name: '上海市', short: '上海', value: 72,   ecoDemo: 4,  twoMountains: 4,  total: 8,  tagline: '寸土寸金处，亦有绿意栖居' },
-    { name: '江苏省', short: '江苏', value: 118,  ecoDemo: 34, twoMountains: 11, total: 45, tagline: '水韵江南，每一滴碧水都是乡愁' },
-    { name: '浙江省', short: '浙江', value: 112,  ecoDemo: 53, twoMountains: 16, total: 69, tagline: '从余村出发——绿水青山就是金山银山' },
-    { name: '安徽省', short: '安徽', value: 78,   ecoDemo: 25, twoMountains: 12, total: 37, tagline: '徽风皖韵里，人与自然相看两不厌' },
-    { name: '福建省', short: '福建', value: 85,   ecoDemo: 49, twoMountains: 13, total: 62, tagline: '红土生金，花果飘香——长汀告诉世界' },
-    { name: '江西省', short: '江西', value: 75,   ecoDemo: 31, twoMountains: 13, total: 44, tagline: '匡庐奇秀处，人与自然共和谐' },
-    { name: '山东省', short: '山东', value: 95,   ecoDemo: 36, twoMountains: 14, total: 50, tagline: '一山一水一圣人，绿染齐鲁万象新' },
-    { name: '河南省', short: '河南', value: 82,   ecoDemo: 22, twoMountains: 9,  total: 31, tagline: '大河之南，文明的底色是绿色' },
-    { name: '湖北省', short: '湖北', value: 88,   ecoDemo: 30, twoMountains: 11, total: 41, tagline: '千湖之省，碧水为魂——每一条河流都是命脉' },
-    { name: '湖南省', short: '湖南', value: 80,   ecoDemo: 26, twoMountains: 10, total: 36, tagline: '芙蓉国里尽朝晖，绿水青山是归处' },
-    { name: '广东省', short: '广东', value: 92,   ecoDemo: 37, twoMountains: 12, total: 49, tagline: '岭南绿韵长，敢为人先亦是生态先行' },
-    { name: '广西壮族自治区', short: '广西', value: 60, ecoDemo: 16, twoMountains: 8,  total: 24, tagline: '八桂大地，山清水秀是自然的馈赠' },
-    { name: '海南省', short: '海南', value: 45,   ecoDemo: 10, twoMountains: 7,  total: 17, tagline: '南海之珠，绿色是最美的底色' },
-    { name: '重庆市', short: '重庆', value: 65,   ecoDemo: 11, twoMountains: 8,  total: 19, tagline: '山城雾都，两江四岸皆春色' },
-    { name: '四川省', short: '四川', value: 105,  ecoDemo: 43, twoMountains: 14, total: 57, tagline: '天府之国，万物并育而不相害' },
-    { name: '贵州省', short: '贵州', value: 58,   ecoDemo: 17, twoMountains: 12, total: 29, tagline: '黔山秀水间，绿色是最坚定的选择' },
-    { name: '云南省', short: '云南', value: 72,   ecoDemo: 23, twoMountains: 13, total: 36, tagline: '彩云之南，万物共生是自然的法则' },
-    { name: '西藏自治区', short: '西藏', value: 35, ecoDemo: 11, twoMountains: 7,  total: 18, tagline: '雪域高原，每一寸都是生态的圣殿' },
-    { name: '陕西省', short: '陕西', value: 88,   ecoDemo: 20, twoMountains: 11, total: 31, tagline: '秦川八百里，绿染黄土是时间的力量' },
-    { name: '甘肃省', short: '甘肃', value: 62,   ecoDemo: 14, twoMountains: 8,  total: 22, tagline: '大漠孤烟直，绿洲生金来' },
-    { name: '青海省', short: '青海', value: 32,   ecoDemo: 9,  twoMountains: 7,  total: 16, tagline: '三江之源，中华水塔——每一滴水都是承诺' },
-    { name: '宁夏回族自治区', short: '宁夏', value: 28, ecoDemo: 8,  twoMountains: 6,  total: 14, tagline: '塞上江南，绿洲是荒漠里的答案' },
-    { name: '新疆维吾尔自治区', short: '新疆', value: 50, ecoDemo: 15, twoMountains: 7,  total: 22, tagline: '天山南北，绿洲如珠是坚持的力量' },
-    { name: '新疆生产建设兵团', short: '兵团', value: 30, ecoDemo: 4,  twoMountains: 5,  total: 9,  tagline: '戈壁深处，绿色是最硬的脊梁' },
+    { name: '北京市', short: '北京', value: 98, ecoDemo: 7, twoMountains: 9, total: 16, tagline: '钢铁与青山的和解，从首钢园开始' },
+    { name: '天津市', short: '天津', value: 42, ecoDemo: 6, twoMountains: 7, total: 13, tagline: '九河入海处，绿意润津门' },
+    { name: '河北省', short: '河北', value: 62, ecoDemo: 14, twoMountains: 12, total: 26, tagline: '塞罕坝的松涛，是荒原对未来的承诺' },
+    { name: '山西省', short: '山西', value: 68, ecoDemo: 18, twoMountains: 11, total: 29, tagline: '黑金褪去，绿染山河——每一种转型都需要勇气' },
+    { name: '内蒙古自治区', short: '内蒙古', value: 38, ecoDemo: 18, twoMountains: 13, total: 31, tagline: '草原辽阔处，绿色是永恒的信仰' },
+    { name: '辽宁省', short: '辽宁', value: 55, ecoDemo: 14, twoMountains: 7, total: 21, tagline: '深坑育果，大地回春——每一寸废矿都能重生' },
+    { name: '吉林省', short: '吉林', value: 40, ecoDemo: 15, twoMountains: 8, total: 23, tagline: '白山松水间，守护是最长情的告白' },
+    { name: '黑龙江省', short: '黑龙江', value: 48, ecoDemo: 13, twoMountains: 7, total: 20, tagline: '林海雪原之下，是万物生长的根基' },
+    { name: '上海市', short: '上海', value: 72, ecoDemo: 3, twoMountains: 4, total: 7, tagline: '寸土寸金处，亦有绿意栖居' },
+    { name: '江苏省', short: '江苏', value: 118, ecoDemo: 41, twoMountains: 13, total: 54, tagline: '水韵江南，每一滴碧水都是乡愁' },
+    { name: '浙江省', short: '浙江', value: 112, ecoDemo: 52, twoMountains: 16, total: 68, tagline: '从余村出发——绿水青山就是金山银山' },
+    { name: '安徽省', short: '安徽', value: 78, ecoDemo: 25, twoMountains: 13, total: 38, tagline: '徽风皖韵里，人与自然相看两不厌' },
+    { name: '福建省', short: '福建', value: 85, ecoDemo: 47, twoMountains: 13, total: 60, tagline: '红土生金，花果飘香——长汀告诉世界' },
+    { name: '江西省', short: '江西', value: 75, ecoDemo: 31, twoMountains: 13, total: 44, tagline: '匡庐奇秀处，人与自然共和谐' },
+    { name: '山东省', short: '山东', value: 95, ecoDemo: 36, twoMountains: 14, total: 50, tagline: '一山一水一圣人，绿染齐鲁万象新' },
+    { name: '河南省', short: '河南', value: 82, ecoDemo: 23, twoMountains: 9, total: 32, tagline: '大河之南，文明的底色是绿色' },
+    { name: '湖北省', short: '湖北', value: 88, ecoDemo: 36, twoMountains: 13, total: 49, tagline: '千湖之省，碧水为魂——每一条河流都是命脉' },
+    { name: '湖南省', short: '湖南', value: 80, ecoDemo: 30, twoMountains: 12, total: 42, tagline: '芙蓉国里尽朝晖，绿水青山是归处' },
+    { name: '广东省', short: '广东', value: 92, ecoDemo: 32, twoMountains: 13, total: 45, tagline: '岭南绿韵长，敢为人先亦是生态先行' },
+    { name: '广西壮族自治区', short: '广西', value: 60, ecoDemo: 22, twoMountains: 9, total: 31, tagline: '八桂大地，山清水秀是自然的馈赠' },
+    { name: '海南省', short: '海南', value: 45, ecoDemo: 6, twoMountains: 8, total: 14, tagline: '南海之珠，绿色是最美的底色' },
+    { name: '重庆市', short: '重庆', value: 65, ecoDemo: 9, twoMountains: 8, total: 17, tagline: '山城雾都，两江四岸皆春色' },
+    { name: '四川省', short: '四川', value: 105, ecoDemo: 43, twoMountains: 13, total: 56, tagline: '天府之国，万物并育而不相害' },
+    { name: '贵州省', short: '贵州', value: 58, ecoDemo: 16, twoMountains: 11, total: 27, tagline: '黔山秀水间，绿色是最坚定的选择' },
+    { name: '云南省', short: '云南', value: 72, ecoDemo: 23, twoMountains: 13, total: 36, tagline: '彩云之南，万物共生是自然的法则' },
+    { name: '西藏自治区', short: '西藏', value: 35, ecoDemo: 21, twoMountains: 8, total: 29, tagline: '雪域高原，每一寸都是生态的圣殿' },
+    { name: '陕西省', short: '陕西', value: 88, ecoDemo: 24, twoMountains: 14, total: 38, tagline: '秦川八百里，绿染黄土是时间的力量' },
+    { name: '甘肃省', short: '甘肃', value: 62, ecoDemo: 13, twoMountains: 8, total: 21, tagline: '大漠孤烟直，绿洲生金来' },
+    { name: '青海省', short: '青海', value: 32, ecoDemo: 13, twoMountains: 9, total: 22, tagline: '三江之源，中华水塔——每一滴水都是承诺' },
+    { name: '宁夏回族自治区', short: '宁夏', value: 28, ecoDemo: 5, twoMountains: 8, total: 13, tagline: '塞上江南，绿洲是荒漠里的答案' },
+    { name: '新疆维吾尔自治区', short: '新疆', value: 50, ecoDemo: 15, twoMountains: 7, total: 22, tagline: '天山南北，绿洲如珠是坚持的力量' },
+    { name: '新疆生产建设兵团', short: '兵团', value: 30, ecoDemo: 4, twoMountains: 6, total: 10, tagline: '戈壁深处，绿色是最硬的脊梁' },
     { name: '台湾省', short: '台湾', value: 50, tagline: '宝岛青山在，绿水绕蓬瀛' },
     { name: '香港特别行政区', short: '香港', value: 50, tagline: '东方之珠，山海皆含翠' },
     { name: '澳门特别行政区', short: '澳门', value: 50, tagline: '濠江碧波暖，绿意满城芳' },
-    { name: '南海诸岛', short: '南海诸岛', value: 20, highlight: true, tagline: '碧海蓝天间，珊瑚生息处' }
+    { name: '南海诸岛', short: '南海诸岛', value: 20, highlight: true, tagline: '碧海蓝天间，珊瑚生息处' },
 ];
 
 const REGION_PIECES = [
@@ -303,6 +303,10 @@ async function initRegionMapBackground() {
                                 <span style="background:rgba(255,255,255,0.1);border-radius:4px;padding:2px 7px;color:rgba(255,255,255,0.7);">
                                     合计 <strong style="color:#ffffff;">${region.total}</strong>
                                 </span>
+                            </div>` : ''}
+                            ${hasEco ? `
+                            <div style="font-size:10.5px;color:rgba(255,255,255,0.52);margin-top:6px;border-top:1px solid rgba(255,255,255,0.14);padding-top:5px;line-height:1.5;">
+                                另有 2 个跨省联合申报基地，全国总计 1006 个
                             </div>` : ''}
 
                         </div>
