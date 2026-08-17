@@ -3,3 +3,20 @@ Thumbs.db
 *.log
 node_modules/
 /dist/
+
+# 编辑器/Obsidian 配置
+.obsidian/
+
+# 视频制作工程（非网页部署内容）
+promo-video/
+record_video.mjs
+
+# 文档与 PPT（非网页部署内容）
+*.pptx
+*.docx
+两山实践创新基地名单汇总.md
+大赛答辩PPT内容框架.md
+演讲稿全文.md
+生态文明建设示范名单统计.md
+答辩Q&A预判.md
+zuopinjianjie.md
