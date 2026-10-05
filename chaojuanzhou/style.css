@@ -683,6 +683,7 @@ body::before {
     inset: 0;
     z-index: 24;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     place-items: center;
     padding: clamp(30px, 6vw, 88px);
     pointer-events: none;
@@ -708,7 +709,9 @@ body::before {
     width: min(94vw, 1720px);
     color: #154c34;
     font-family: "STKaiti", "KaiTi", "KaiTi_GB2312", "FangSong", "FangSong_GB2312", "Microsoft YaHei", "PingFang SC", serif;
-    font-size: clamp(22px, 2vw, 36px);
+    /* 单行最长约 38 字宽：下界由 22px 降到 18px 以适配 701–1100px 窄屏；
+       更窄处继续按 2.45vw 等比缩小，保证单行文案不被右侧裁切 */
+    font-size: clamp(min(18px, 2.45vw), 2vw, 36px);
     font-weight: 700;
     line-height: 1.42;
     letter-spacing: 0;
@@ -743,6 +746,10 @@ body::before {
     align-items: center;
     gap: 0.3em;
     padding: 0 28px;
+    /* left:50% 下 width:auto 会收缩到半屏宽，窄屏时被迫在词中折行；
+       按内容取宽并限制在视口内，居中由 translateX(-50%) 完成 */
+    width: max-content;
+    max-width: 100%;
     pointer-events: none;
     opacity: var(--credit-opacity, 0);
     transform: translate3d(-50%, var(--credit-y, 36px), 0);
@@ -836,12 +843,14 @@ body::before {
 
     .outro-copy {
         width: min(100%, 350px);
-        font-size: clamp(18px, 5.5vw, 24px);
-        line-height: 1.66;
+        font-size: clamp(15px, min(4.6vw, 2.7vh), 22px);
+        line-height: 1.6;
     }
 
+    /* 窄屏放开单行限制：长句折行显示，避免右侧溢出被裁切 */
     .outro-copy p {
-        margin-bottom: 0.8em;
+        white-space: normal;
+        margin-bottom: 0.55em;
     }
 
     .center-nav {
@@ -902,16 +911,20 @@ body::before {
     }
 
     .credit-section {
-        bottom: clamp(36px, 6vh, 72px);
+        bottom: clamp(28px, 5vh, 64px);
         padding: 0 24px;
     }
 
+    .credit-label {
+        font-size: clamp(11px, 3.2vw, 14px);
+    }
+
     .credit-maker {
-        font-size: clamp(13px, 4.2vw, 17px);
+        font-size: clamp(12px, min(3.9vw, 2.1vh), 16px);
     }
 
     .credit-teachers {
-        font-size: clamp(13px, 4.2vw, 17px);
+        font-size: clamp(12px, min(3.9vw, 2.1vh), 16px);
     }
 }
 
